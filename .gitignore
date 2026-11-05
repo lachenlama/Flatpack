@@ -1,0 +1,10 @@
+contracts/artifacts/
+contracts/cache/
+contracts/coverage/
+contracts/types/
+contracts/ignition/deployments/chain-31337/
+node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store

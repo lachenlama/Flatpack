@@ -1,0 +1,32 @@
+{
+  "name": "flatpack-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.10.0"
+  },
+  "scripts": {
+    "build": "hardhat build",
+    "test": "hardhat test solidity --grep-exclude _F_",
+    "test:fork": "hardhat test solidity --grep _F_",
+    "coverage": "hardhat test solidity --grep-exclude _F_ --coverage",
+    "fmt": "prettier --write \"src/**/*.sol\" \"test/**/*.sol\"",
+    "fmt:check": "prettier --check \"src/**/*.sol\" \"test/**/*.sol\""
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.7",
+    "@types/node": "^26.6.6",
+    "forge-std": "github:foundry-rs/forge-std#v1.16.2",
+    "hardhat": "^3.21.2",
+    "prettier": "^3.9.10",
+    "prettier-plugin-solidity": "^2.4.1",
+    "typescript": "^7.0.2",
+    "viem": "^2.57.16"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.6.1",
+    "@openzeppelin/contracts-upgradeable": "^5.6.1",
+    "@uniswap/v4-core": "^1.0.2"
+  }
+}
