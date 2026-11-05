@@ -118,5 +118,6 @@
     "COST has NO Chainlink feed on this chain, so it is excluded. The live dividend demo uses AAPL (cash dividend processed 2026-11-16).",
     "Uniswap Universal Router address is disputed (0x8876...0904 vs 0x06af...BF99, Uniswap/sdks#763). We do not depend on any periphery router (ADR-0005).",
     "Stock Tokens are pausable (NVDA exposes paused()). See ADR-0003."
-  ]
+  ],
+  "multicall3": "0xcA11bde05977b3631167028862bE2a173976CA11"
 }

@@ -6,7 +6,9 @@
 | WP1 | `ComponentRegistry`, `Basket`, `BasketFactory` + unit, fuzz and invariant tests | WP0 | Sonnet agent | **accepted** (77 tests, 100% coverage) |
 | WP2 | `BackingVault`, `libraries/StockMath` + unit and invariant tests | WP0 | Sonnet agent (parallel with WP1) | **accepted** after review R-1 (JIT-stake warmup), R-2 (pull rewards), R-3 (ceil reward debt, applied by architect) |
 | WP3 | `FlatpackRouter`, `FeeHarvester`, swap libraries + fork and E2E tests | WP1, WP2 merged | Sonnet agent | **accepted** (18 mainnet-fork tests; claimIOU deviation approved) |
-| WP4 | Hardhat Ignition deploy module, registry seeding, keeper bot (`keeper/`, TypeScript and viem) | WP3 | Sonnet agent | next |
+| WP4a | Ignition deploy, fork rehearsal, smoke, shared units, demo baskets, DEPLOY runbook ([brief](WP4a-deploy.md)) | WP3 | Sonnet agent | **accepted** (fork deploy + smoke 52/52; smoke now reuses the module symbol list) |
+| WP4b | Stateless keeper (Node 24 and viem), Actions cron and CI, KEEPER runbook ([brief](WP4b-keeper.md)) | WP3 | Sonnet agent (parallel with WP4a) | **accepted** (32 tests, typecheck clean) |
+| WP4c | E2E rehearsal: deploy on a local fork node, then run a keeper tick against it | WP4a, WP4b | Sonnet agent | in progress |
 | WP5 | Next.js app (Explore, Basket, Assemble, burn counter, geofence) | WP3 ABIs | Sonnet agent | blocked |
 | WP6 | Security review, gas review, README and demo script | all | Opus | blocked |
 
