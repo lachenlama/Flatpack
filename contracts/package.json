@@ -12,7 +12,13 @@
     "test:fork": "hardhat test solidity --grep _F_",
     "coverage": "hardhat test solidity --grep-exclude _F_ --coverage",
     "fmt": "prettier --write \"src/**/*.sol\" \"test/**/*.sol\"",
-    "fmt:check": "prettier --check \"src/**/*.sol\" \"test/**/*.sol\""
+    "fmt:check": "prettier --check \"src/**/*.sol\" \"test/**/*.sol\"",
+    "params": "node scripts/params.ts",
+    "deploy:fork-test": "hardhat test nodejs",
+    "deploy:mainnet": "hardhat ignition deploy ignition/modules/Flatpack.ts --network robinhood --parameters ignition/parameters/mainnet.json --verify",
+    "smoke:mainnet": "node scripts/smoke.ts",
+    "export:deployment": "node scripts/export-deployment.ts",
+    "demo:baskets": "hardhat run scripts/demo-baskets.ts --network robinhood"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-viem": "^5.0.7",

@@ -29,6 +29,26 @@ const config: HardhatUserConfig = {
       forking: { rpcEndpoints: { robinhood: RH_RPC_URL } },
     },
   },
+  // Hardhat 3 needs a descriptor to verify on a chain it doesn't know (hardhat-verify -> Blockscout)
+  chainDescriptors: {
+    4663: {
+      name: "Robinhood Chain",
+      chainType: "generic",
+      blockExplorers: {
+        blockscout: {
+          name: "Robinhood Chain Blockscout",
+          url: "https://robinhoodchain.blockscout.com",
+          apiUrl: "https://robinhoodchain.blockscout.com/api",
+        },
+      },
+    },
+  },
+  // Blockscout needs no API key; Etherscan and Sourcify are off
+  verify: {
+    blockscout: { enabled: true },
+    etherscan: { enabled: false },
+    sourcify: { enabled: false },
+  },
   networks: {
     // Robinhood Chain is an Arbitrum Orbit chain, hence chainType "generic"
     robinhood: {

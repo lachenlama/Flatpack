@@ -1,0 +1,19 @@
+{
+  "_comment": "Weights are in percent (must sum to 100). targetShareUsd = intended USD value of 1 share (1e18 raw) at creation. Symbols must exist in config/mainnet-4663.json launchUniverse.",
+  "baskets": [
+    {
+      "name": "AI Picks & Shovels",
+      "symbol": "AISHOVEL",
+      "mode": "Reinvest",
+      "targetShareUsd": 100,
+      "weights": { "NVDA": 30, "MSFT": 25, "GOOGL": 20, "META": 15, "MU": 10 }
+    },
+    {
+      "name": "Dividend Demo",
+      "symbol": "DIVDEMO",
+      "mode": "PayInWif",
+      "targetShareUsd": 100,
+      "weights": { "AAPL": 50, "MSFT": 30, "SPY": 20 }
+    }
+  ]
+}
