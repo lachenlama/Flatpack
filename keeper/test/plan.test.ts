@@ -26,19 +26,29 @@ test("idle: no actions", () => {
   assert.deepEqual(plan(snap([]), CFG), []);
 });
 
-test("rule 1: multiplier change -> sync", () => {
+test("rule 1+2 (R-5): multiplier change -> sync then harvestDividends in the same tick", () => {
   const s = snap([bsk(B1, { tokens: [tok(T1, { uiMultiplier: 2n * 10n ** 18n }), tok(T2)] })]);
-  assert.deepEqual(plan(s, CFG), [{ kind: "sync", basket: B1 }]);
+  assert.deepEqual(plan(s, CFG), [
+    { kind: "sync", basket: B1 },
+    { kind: "harvestDividends", basket: B1 },
+  ]);
 });
 
-test("rule 1: sync skipped when a dividend harvest is planned", () => {
+test("rule 1: change with an already-pending dividend -> sync then one harvestDividends", () => {
   const s = snap([bsk(B1, { tokens: [tok(T1, { uiMultiplier: 2n, pendingDividend: 5n }), tok(T2)] })]);
-  assert.deepEqual(plan(s, CFG), [{ kind: "harvestDividends", basket: B1 }]);
+  assert.deepEqual(plan(s, CFG), [
+    { kind: "sync", basket: B1 },
+    { kind: "harvestDividends", basket: B1 },
+  ]);
 });
 
-test("rule 1: sync skipped when a fee harvest is planned", () => {
+test("rule 1: change plus fee shares -> sync, harvestDividends, then harvestFees", () => {
   const s = snap([bsk(B1, { pendingFeeShares: 1n, tokens: [tok(T1, { uiMultiplier: 2n }), tok(T2)] })]);
-  assert.deepEqual(plan(s, CFG), [{ kind: "harvestFees", basket: B1 }]);
+  assert.deepEqual(plan(s, CFG), [
+    { kind: "sync", basket: B1 },
+    { kind: "harvestDividends", basket: B1 },
+    { kind: "harvestFees", basket: B1 },
+  ]);
 });
 
 test("rule 2: pending dividend -> harvestDividends", () => {
@@ -82,6 +92,7 @@ test("ordering: dividends, IOU claims, fees, settle; per basket in snapshot orde
     { kind: "harvestFees", basket: B1 },
     { kind: "settle", basket: B1 },
     { kind: "sync", basket: B2 },
+    { kind: "harvestDividends", basket: B2 },
     { kind: "settle", basket: B2 },
   ]);
 });
