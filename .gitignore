@@ -8,6 +8,8 @@ node_modules/
 .env.*
 !.env.example
 .DS_Store
-contracts/ignition/deployments/rehearsal/
-contracts/ignition/parameters/rehearsal.json
-shared/deployments/rehearsal.json
+contracts/ignition/deployments/rehearsal*/
+contracts/ignition/parameters/rehearsal*.json
+shared/deployments/rehearsal*.json
+.next*/
+tsconfig.tsbuildinfo

@@ -10,7 +10,7 @@ import { privateKeyToAccount } from "viem/accounts";
 
 export type Address = `0x${string}`;
 
-export const RPC_URL = process.env.REHEARSAL_RPC ?? "http://127.0.0.1:8545";
+export const RPC_URL = process.env.REHEARSAL_RPC ?? `http://127.0.0.1:${process.env.RH_PORT ?? "8545"}`;
 if (!/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/?$/.test(RPC_URL)) {
   throw new Error(`refusing to run the rehearsal against a non-local RPC: ${RPC_URL}`);
 }

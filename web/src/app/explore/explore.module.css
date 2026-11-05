@@ -1,0 +1,19 @@
+.head { display: flex; justify-content: space-between; gap: var(--space-4); align-items: start; flex-wrap: wrap; margin-bottom: var(--space-4); }
+.head h1 { margin-bottom: var(--space-2); }
+.head p { margin: 0; max-width: 60ch; }
+.tools { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); font-size: 0.9rem; }
+.tools select { font: inherit; padding: 6px 8px; background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius); }
+.desktop { display: none; }
+.mobile { display: grid; gap: var(--space-3); }
+@media (min-width: 820px) {
+  .desktop { display: block; }
+  .mobile { display: none; }
+  .tools { display: none; }
+}
+.nameCell { display: flex; flex-direction: column; gap: 6px; min-width: 190px; }
+.nameCell a { font-weight: 650; }
+.cardTop { display: flex; justify-content: space-between; gap: var(--space-2); align-items: start; }
+.cardName { font-weight: 650; font-size: 1.05rem; }
+.cardRow { display: flex; justify-content: space-between; gap: var(--space-2); margin-top: var(--space-2); font-size: 0.9rem; color: var(--ink-2); align-items: center; }
+.cardLink { text-decoration: none; color: inherit; display: block; }
+.cardLink:hover { border-color: var(--ink); }

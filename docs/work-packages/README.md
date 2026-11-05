@@ -9,8 +9,10 @@
 | WP4a | Ignition deploy, fork rehearsal, smoke, shared units, demo baskets, DEPLOY runbook ([brief](WP4a-deploy.md)) | WP3 | Sonnet agent | **accepted** (fork deploy + smoke 52/52; smoke now reuses the module symbol list) |
 | WP4b | Stateless keeper (Node 24 and viem), Actions cron and CI, KEEPER runbook ([brief](WP4b-keeper.md)) | WP3 | Sonnet agent (parallel with WP4a) | **accepted** (32 tests, typecheck clean) |
 | WP4c | E2E rehearsal: deploy on a local fork node, then run a keeper tick against it | WP4a, WP4b | Sonnet agent | **accepted** (REHEARSAL OK, 3 deploy-day bugs fixed; R-5 same-tick dividends) |
-| WP5 | Next.js app (Explore, Basket, Assemble, burn counter, geofence) | WP3 ABIs | Sonnet agent | next |
-| WP6 | Security review, gas review, README and demo script | all | Opus | blocked |
+| WP5a | Web foundation: design system, wallet, data layer, geofence, Home/Proof ([brief](WP5a-web-foundation.md), [UX spec](../architecture/WP5-UX.md)) | WP4 | Sonnet agent | **accepted** (28 tests; fork-verified pages; R-6 per-port rehearsals, R-7 WalletConnect removed, R-8 guarded mock wallet + browser e2e) |
+| WP5b | Explore and Basket pages ([brief](WP5b-explore-basket.md)) | WP5a | Sonnet agent | **accepted** (browser click-through buy + back; chain-clock deadline fix; brand copy fix by architect) |
+| WP5c | Assemble, Portfolio and Flywheel pages ([brief](WP5c-assemble-portfolio-flywheel.md)) | WP5a | Sonnet agent (parallel with WP5b) | **accepted** (browser click-through assemble + referral claim; fee-split copy corrected by architect) |
+| WP6 | Security review, gas review, README and demo script | all | Opus | next |
 
 **Process**
 1. The architect publishes the binding interfaces and the brief.

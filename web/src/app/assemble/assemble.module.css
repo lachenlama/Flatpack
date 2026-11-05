@@ -1,0 +1,29 @@
+.steps { display: grid; gap: var(--space-5); margin-top: var(--space-4); }
+.step { border-top: 2px solid var(--ink); padding-top: var(--space-3); }
+.stepHead { display: flex; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-3); }
+.stepHead h2 { margin: 0; font-size: 1.25rem; }
+.num { font-family: var(--font-mono); font-size: 1.6rem; line-height: 1; }
+.picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
+.pick { text-align: left; background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius); padding: var(--space-2) var(--space-3); cursor: pointer; font: inherit; color: var(--ink); display: grid; gap: 2px; }
+.pick:hover { border-color: var(--ink); }
+.pick[aria-pressed="true"] { border-color: var(--ink); background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--ink); }
+.pick:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.pickTop { display: flex; justify-content: space-between; font-family: var(--font-mono); font-weight: 650; }
+.pickSub { font-size: 0.8rem; color: var(--ink-2); }
+.input { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius); padding: 8px 10px; min-width: 0; }
+.input:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+.input[aria-invalid="true"] { border-color: var(--critical); }
+.wRow { display: grid; grid-template-columns: 5rem 7rem 1fr; gap: var(--space-3); align-items: center; margin-bottom: var(--space-2); }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); }
+.field { display: grid; gap: 4px; }
+.field label, .legend { font-size: 0.85rem; color: var(--ink-2); }
+.err { color: var(--critical); font-size: 0.88rem; margin: 4px 0 0; }
+.ok { color: var(--good); font-size: 0.88rem; margin: 4px 0 0; }
+.radios { display: flex; gap: var(--space-4); flex-wrap: wrap; border: 0; padding: 0; margin: var(--space-3) 0 0; }
+.radios label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.units { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin-top: var(--space-3); }
+.units th, .units td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+.units td.r, .units th.r { text-align: right; }
+.hyp { font-size: 0.85rem; color: var(--ink-2); }
+.done { border: 2px solid var(--ink); border-radius: var(--radius-lg); padding: var(--space-4); background: var(--paper-2); }
+.row { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center; }

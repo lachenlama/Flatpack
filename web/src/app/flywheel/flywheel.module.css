@@ -1,0 +1,16 @@
+.hero { padding: var(--space-5) 0 var(--space-4); }
+.heroLabel { color: var(--ink-2); margin: 0; }
+.heroNum { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: clamp(2.4rem, 8vw, 4.5rem); font-weight: 700; line-height: 1.1; }
+.heroSub { color: var(--ink-2); max-width: 60ch; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--space-3); }
+.h2 { margin: var(--space-6) 0 var(--space-3); }
+.svg { width: 100%; height: auto; display: block; }
+.node { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+.nodeText { fill: var(--ink); font-size: 14px; font-weight: 600; }
+.edge { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.arrowHead { fill: var(--ink); }
+.edgeText { fill: var(--ink); font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; paint-order: stroke; stroke: var(--paper-2); stroke-width: 4px; }
+.edgeSub { fill: var(--ink-2); font-size: 11px; }
+.feed { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.feed li { display: grid; grid-template-columns: 10rem 1fr auto auto; gap: var(--space-3); align-items: center; padding: var(--space-2) 0; border-bottom: 1px solid var(--rule); font-size: 0.92rem; }
+@media (max-width: 720px) { .feed li { grid-template-columns: 1fr; gap: 2px; } }

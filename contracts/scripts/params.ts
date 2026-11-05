@@ -120,7 +120,8 @@ function main(): void {
   };
   if (process.argv.includes("--rehearsal")) {
     // local-node rehearsal only: touches nothing but rehearsal.json (owner/keeper = dev accounts #0 and #1)
-    write("rehearsal.json", buildParameters(config, FORK_OWNER, FORK_KEEPER, stake));
+    // --name <id> (default "rehearsal") lets parallel rehearsals use rehearsal-<port>.json
+    write(`${argValue("--name") ?? "rehearsal"}.json`, buildParameters(config, FORK_OWNER, FORK_KEEPER, stake));
     return;
   }
   write("fork.json", buildParameters(config, FORK_OWNER, FORK_KEEPER, stake));

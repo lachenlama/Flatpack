@@ -1,0 +1,15 @@
+.wrap { position: relative; display: inline-block; }
+.list { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.walletBtn { width: 100%; justify-content: flex-start; }
+.walletIcon { width: 22px; height: 22px; border-radius: 4px; }
+.menu {
+  position: absolute; right: 0; top: calc(100% + 6px); background: var(--paper); border: 1px solid var(--ink); border-radius: var(--radius);
+  padding: var(--space-2); min-width: 190px; z-index: 40; display: flex; flex-direction: column; gap: 2px;
+}
+.menuItem { all: unset; box-sizing: border-box; display: block; padding: 8px 10px; border-radius: 4px; cursor: pointer; font-size: 0.92rem; }
+.menuItem:hover { background: var(--paper-2); }
+.menuItem:focus-visible { outline: var(--focus); }
+.check { display: flex; gap: var(--space-3); align-items: flex-start; margin: var(--space-4) 0; cursor: pointer; }
+.check input { margin-top: 5px; width: 18px; height: 18px; accent-color: var(--ink); }
+.actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.err { color: var(--ink); font-size: 0.9rem; margin-top: var(--space-2); }

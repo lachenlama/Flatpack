@@ -63,7 +63,7 @@ const config: HardhatUserConfig = {
       type: "http",
       chainType: "generic",
       chainId: 4663,
-      url: "http://127.0.0.1:8545",
+      url: `http://127.0.0.1:${process.env.RH_PORT ?? "8545"}`,
     },
     robinhoodFork: {
       type: "edr-simulated",
