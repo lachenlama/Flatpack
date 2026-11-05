@@ -2,7 +2,8 @@
  * Writes shared/deployments/<chainId>.json from Ignition's deployment record:
  *   ignition/deployments/chain-<id>/deployed_addresses.json  -> addresses
  *   ignition/deployments/chain-<id>/journal.jsonl            -> first block with a confirmed deploy transaction
- * Usage: node scripts/export-deployment.ts [--chain 4663]
+ * Usage: node scripts/export-deployment.ts [--chain 4663] [--deployment-id <id>] [--out <name>]
+ * (rehearsal: --deployment-id rehearsal --out rehearsal -> shared/deployments/rehearsal.json)
  * The keeper (WP4b) and the app (WP5) read the output. `blockNumber` is the start block for event indexing.
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -21,6 +22,8 @@ export interface DeploymentFile {
 export function cleanAddresses(raw: Record<string, string>): Record<string, string> {
   const out: Record<string, string> = {};
   for (const [key, value] of Object.entries(raw)) out[key.includes("#") ? key.split("#")[1] ?? key : key] = value;
+  // the keeper (config.ts) and the app look the Basket implementation up as `Basket`; Ignition calls it BasketImplementation
+  if (out.Basket === undefined && out.BasketImplementation !== undefined) out.Basket = out.BasketImplementation;
   return out;
 }
 
@@ -39,10 +42,15 @@ export function firstBlockFromJournal(journal: string): number {
 }
 
 function main(): void {
-  const i = process.argv.indexOf("--chain");
-  const chainId = i >= 0 ? Number(process.argv[i + 1]) : 4663;
+  const argValue = (name: string): string | undefined => {
+    const i = process.argv.indexOf(name);
+    return i >= 0 ? process.argv[i + 1] : undefined;
+  };
+  const chainId = Number(argValue("--chain") ?? 4663);
   const here = dirname(fileURLToPath(import.meta.url));
-  const dir = join(here, "..", "ignition", "deployments", `chain-${chainId}`);
+  // --deployment-id <id>: Ignition deployment id (default chain-<chainId>); --out <name>: shared/deployments/<name>.json
+  // (rehearsal: --deployment-id rehearsal --out rehearsal; 4663.json stays reserved for the real mainnet deploy)
+  const dir = join(here, "..", "ignition", "deployments", argValue("--deployment-id") ?? `chain-${chainId}`);
   const raw = JSON.parse(readFileSync(join(dir, "deployed_addresses.json"), "utf8")) as Record<string, string>;
   const blockNumber = firstBlockFromJournal(readFileSync(join(dir, "journal.jsonl"), "utf8"));
   const file: DeploymentFile = {
@@ -53,7 +61,7 @@ function main(): void {
   };
   const outDir = join(here, "..", "..", "shared", "deployments");
   mkdirSync(outDir, { recursive: true });
-  const out = join(outDir, `${chainId}.json`);
+  const out = join(outDir, `${argValue("--out") ?? chainId}.json`);
   writeFileSync(out, JSON.stringify(file, null, 2) + "\n");
   console.log(`wrote ${out}`);
 }

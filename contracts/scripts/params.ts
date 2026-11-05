@@ -3,7 +3,7 @@
  *   ignition/parameters/fork.json     (owner/keeper = the default Hardhat dev accounts #0 and #1)
  *   ignition/parameters/mainnet.json  (owner/keeper from --owner/--keeper or OWNER/KEEPER env vars)
  *
- * Usage:  node scripts/params.ts [--owner 0x..] [--keeper 0x..] [--min-stake <WIF, whole tokens>]
+ * Usage:  node scripts/params.ts [--owner 0x..] [--keeper 0x..] [--min-stake <WIF, whole tokens>] [--rehearsal]
  * The owner of the mainnet deploy MUST be the deployer account (Ignition sends the owner-only wiring calls from it).
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -19,7 +19,7 @@ export const DEFAULT_MIN_STAKE_WIF = 1000n;
 
 /** Hardhat/EDR default dev accounts #0 and #1, used as owner and keeper on the fork rehearsal. */
 export const FORK_OWNER = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
-export const FORK_KEEPER = "0x70997970C51812dc3A010C7d01b50e3d17c3F4B6";
+export const FORK_KEEPER = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
 
 const ZERO = "0x0000000000000000000000000000000000000000";
 
@@ -118,6 +118,11 @@ function main(): void {
     writeFileSync(join(outDir, name), JSON.stringify({ Flatpack: params }, null, 2) + "\n");
     console.log(`wrote ignition/parameters/${name}`);
   };
+  if (process.argv.includes("--rehearsal")) {
+    // local-node rehearsal only: touches nothing but rehearsal.json (owner/keeper = dev accounts #0 and #1)
+    write("rehearsal.json", buildParameters(config, FORK_OWNER, FORK_KEEPER, stake));
+    return;
+  }
   write("fork.json", buildParameters(config, FORK_OWNER, FORK_KEEPER, stake));
   write("mainnet.json", buildParameters(config, owner, keeper, stake));
   if (owner === ZERO || keeper === ZERO) {

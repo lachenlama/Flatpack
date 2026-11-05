@@ -19,7 +19,7 @@ Everything below runs from `contracts/`. In WSL, load Node 24 first (`nvm use 24
 |---|---|
 | Deployer account | A fresh EOA. **It becomes the owner of Registry, Harvester, Vault and Factory** (Ownable2Step), and it must be the account Ignition sends from. |
 | ETH on 4663 | Fork gas measured: **12,520,318 gas** for all 21 transactions. At `eth_gasPrice` = 22,589,824 wei (about 0.0226 gwei, read 2026-11-05) that is about **0.00028 ETH**. A mainnet `eth_estimateGas` for the Basket creation was about 0.15M gas above the fork, which suggests the Orbit L1 data component is small. **Fund 0.002 ETH minimum; 0.005 ETH is comfortable** (also covers the demo baskets and a few owner calls). |
-| Keeper account | A second EOA (public address only is needed for the deploy). It is funded separately for harvests (about 0.7M gas each). The keeper key is the only key that goes to GitHub Actions. |
+| Keeper account | A second EOA (public address only is needed for the deploy). It is funded separately. Measured in the WP4c rehearsal: harvestFees uses 0.9–1.1M gas (budget 1.2M), harvestDividends about 0.45M, sync about 0.22M and settle about 0.2–0.26M. At about 0.023 gwei, a busy day of ticks costs well under $0.10, so 0.002 ETH lasts the event. The keeper key is the only key that goes to GitHub Actions. |
 | WIF (demo baskets only) | `minCuratorStake` is 1000 WIF per basket (set in `scripts/params.ts`, `--min-stake`). Two demo baskets need 2000 WIF in the deployer wallet. |
 | USDG (optional) | Only for `demo:baskets --buy <usdg>`. |
 | RPC | `https://rpc.mainnet.chain.robinhood.com` is the default. For a flaky RPC set `RH_RPC_URL`. |
@@ -63,6 +63,8 @@ npx hardhat ignition deploy ignition/modules/Flatpack.ts \
 # alias: npm run deploy:mainnet
 ```
 
+- **Run this in an interactive terminal.** Hardhat 3 asks for confirmation (y/N) before deploying to a non-simulated network and aborts if stdin isn't a TTY (WP4c finding). Don't pipe it or run it from CI.
+- **Rehearse first, on the same day:** `bash tools/rehearse.sh` must end with `REHEARSAL OK` (a local mainnet fork with the same module, the keeper, a harvest, a settle and a dividend, about 5 minutes).
 - Ignition shows a plan, then sends the 21 transactions in order. The journal is in `ignition/deployments/chain-4663/`. **Commit that directory**: it is the deployment record (ADR-0011).
 - `--verify` verifies on Blockscout at the end (config: `verify.blockscout` and `chainDescriptors[4663]` in `hardhat.config.ts`). If verification fails (explorer down), the deployment is still fine; use step 7.
 

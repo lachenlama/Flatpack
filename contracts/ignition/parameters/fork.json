@@ -1,7 +1,7 @@
 {
   "Flatpack": {
     "owner": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-    "keeper": "0x70997970C51812Dc3A010C7d01b50E3d17c3F4b6",
+    "keeper": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
     "minCuratorStake": "1000000000000000000000n",
     "usdg": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
     "weth": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",

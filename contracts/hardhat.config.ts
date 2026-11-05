@@ -58,6 +58,13 @@ const config: HardhatUserConfig = {
       url: configVariable("RH_RPC_URL"),
       accounts: [configVariable("DEPLOYER_PRIVATE_KEY")],
     },
+    // Local mainnet-fork node for the deploy-day rehearsal (tools/rehearse.sh starts it with --chain-id 4663)
+    rehearsal: {
+      type: "http",
+      chainType: "generic",
+      chainId: 4663,
+      url: "http://127.0.0.1:8545",
+    },
     robinhoodFork: {
       type: "edr-simulated",
       chainType: "generic",
