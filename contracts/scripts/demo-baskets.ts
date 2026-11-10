@@ -1,7 +1,7 @@
 /**
  * Creates the demo baskets from scripts/demo-baskets.json on the connected network.
  *   npx hardhat run scripts/demo-baskets.ts --network robinhood -- [--buy <usdg>] [--only <symbol>]
- * (or `npm run demo:baskets`). Env: FLATPACK_DEPLOYMENT (default ../shared/deployments/4663.json).
+ * Hardhat 3 rejects extra flags, so use env vars instead: DEMO_ONLY=<symbol> DEMO_BUY=<usdg> npm run demo:baskets. Env: FLATPACK_DEPLOYMENT (default ../shared/deployments/4663.json).
  * The curator is the network's first account and must hold at least `minCuratorStake` WIF per basket
  * (and USDG for --buy).
  */
@@ -49,9 +49,9 @@ const connection = await network.getOrCreate();
 const publicClient = (await connection.viem.getPublicClient()) as unknown as DemoPublicClient;
 const [wallet] = await connection.viem.getWalletClients();
 if (wallet === undefined) throw new Error("no wallet client (is DEPLOYER_PRIVATE_KEY set in the keystore?)");
-const buyArg = argValue("--buy");
+const buyArg = argValue("--buy") ?? process.env.DEMO_BUY;
 const buy = buyArg === undefined ? undefined : parseUnits(buyArg, 6);
-const only = argValue("--only");
+const only = argValue("--only") ?? process.env.DEMO_ONLY;
 
 for (const spec of specs.filter((s) => only === undefined || s.symbol === only)) {
   const r = await createDemoBasket(publicClient, wallet as unknown as DemoWalletClient, ctx, spec, buy);
