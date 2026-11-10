@@ -25,7 +25,7 @@ const basket = (process.env.BASKET as Address | undefined) ?? list.baskets?.[0]?
 
 async function page(): Promise<{ holders: number; tvl: number; html: string }> {
   const html = await (await fetch(`${APP}/b/${basket}`)).text();
-  const h = /data-testid="holders"[^>]*>(\d+) holders?</.exec(html) ?? /(\d+) holders?/.exec(html);
+  const h = /data-testid="holders"[^>]*>(\d+)</.exec(html);
   const t = /data-testid="tvl"[^>]*>\$([\d,\.]+)</.exec(html);
   if (!h || !t) fail(`holders/tvl not found in /b/${basket} HTML`);
   return { holders: Number(h![1]), tvl: Number((t![1] as string).replace(/,/g, "")), html };

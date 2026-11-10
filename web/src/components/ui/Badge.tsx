@@ -33,13 +33,11 @@ export function ModeBadge({ mode }: { mode: BasketMode }) {
   return mode === "PayInWif" ? <Badge icon={"◆"}>Pays $WIF</Badge> : <Badge icon={"↻"}>Reinvest</Badge>;
 }
 
-/** vs-SPY status: "▲ +1.2 pts beating" / "▼ −0.4 pts behind". */
+/**
+ * vs-SPY status: "▲ +1.2 pts vs SPY" / "▼ −0.8 pts vs SPY" / "● Even with SPY".
+ * `label` is the signed points string (e.g. from `formatPts`); the icon carries the direction alongside the sign.
+ */
 export function BeatBadge({ pts, label }: { pts: number; label: string }) {
-  if (Math.abs(pts) < 0.05) return <Badge tone="neutral" icon={"●"}>{label} level</Badge>;
-  const beating = pts > 0;
-  return (
-    <Badge tone={beating ? "good" : "critical"}>
-      {label} {beating ? "beating" : "behind"}
-    </Badge>
-  );
+  if (Math.abs(pts) < 0.05) return <Badge tone="neutral" icon={"●"}>Even with SPY</Badge>;
+  return <Badge tone={pts > 0 ? "good" : "critical"}>{label} vs SPY</Badge>;
 }

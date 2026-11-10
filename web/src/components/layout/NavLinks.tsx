@@ -7,8 +7,6 @@ import s from "./layout.module.css";
 const LINKS = [
   { href: "/explore", label: "Explore" },
   { href: "/assemble", label: "Assemble" },
-  { href: "/flywheel", label: "Flywheel" },
-  { href: "/proof", label: "Proof" },
   { href: "/me", label: "My portfolio" },
 ] as const;
 

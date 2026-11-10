@@ -12,4 +12,4 @@ On Robinhood Chain the Universal Router address is disputed (Uniswap/sdks#763), 
 
 ## Consequences
 - (+) Fewer external trust assumptions. The integration matches the chain exactly.
-- (−) We own the swap code, so it must be fork-tested against the live pools (TEST-PLAN, F-series).
+- (−) We own the swap code, so it must be fork-tested against the live pools.

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import "../styles/globals.css";
 import { SITE_URL } from "../lib/chain.ts";
@@ -7,6 +8,10 @@ import { Header } from "../components/layout/Header.tsx";
 import { Providers } from "../components/layout/Providers.tsx";
 import { THEME_INIT_SCRIPT } from "../components/layout/ThemeToggle.tsx";
 import s from "../components/layout/layout.module.css";
+
+// Text and numbers. The CSS variables feed --font-sans / --font-mono in styles/tokens.css.
+const plexSans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-plex-sans", display: "swap" });
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-plex-mono", display: "swap" });
 
 // Every page reads live chain data (cached in-process), so nothing is prerendered at build time.
 export const dynamic = "force-dynamic";
@@ -29,7 +34,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${plexSans.variable} ${plexMono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>

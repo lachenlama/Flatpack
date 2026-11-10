@@ -12,8 +12,8 @@ test("blocked countries are rewritten to /restricted", () => {
   assert.deepEqual(decideGeofence("us", "/me"), { action: "rewrite", to: "/restricted" });
 });
 
-test("/proof, /restricted, /api and static assets stay reachable for blocked countries", () => {
-  for (const p of ["/proof", "/proof/", "/restricted", "/api/baskets", "/api/og/0xabc", "/_next/static/a.js", "/favicon.ico", "/logo.svg"]) {
+test("/restricted, /api and static assets stay reachable for blocked countries", () => {
+  for (const p of ["/restricted", "/api/baskets", "/api/og/0xabc", "/_next/static/a.js", "/favicon.ico", "/logo.svg"]) {
     assert.deepEqual(decideGeofence("US", p), { action: "allow" }, p);
   }
 });

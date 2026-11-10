@@ -5,11 +5,14 @@
 # Idempotent: wipes its own journal/params/export/state each run, and ALWAYS kills the node it started.
 # Local node only. The keys below are the PUBLIC Hardhat test keys (accounts #0, #1) and only ever target 127.0.0.1.
 # Flag --keep: after a successful run leave the fork node running and print the env for the web app.
+# Flag --fast: stop after the first keeper harvest (skips dry-run, time-travel settle, dividend and idle tick). The fork's upstream
+#      state expires ~10 minutes after the node starts, so tools/demo.sh uses this to leave you more of that window.
 # Env: RH_PORT (fork node port, default 8545; OUT dir gets a -<port> suffix when not 8545), BUY_USDG (per basket, default 1000), MIN_HARVEST_WIF (keeper threshold, default: keeper default),
 #      RH_RPC_URL (fork source, default the public RPC), SKIP_STRETCH=1.
 set -uo pipefail
 KEEP=0
-for a in "$@"; do case "$a" in --keep) KEEP=1;; *) echo "unknown argument: $a"; exit 2;; esac; done
+FAST=0
+for a in "$@"; do case "$a" in --keep) KEEP=1;; --fast) FAST=1;; *) echo "unknown argument: $a"; exit 2;; esac; done
 export NVM_DIR="$HOME/.nvm"
 # shellcheck disable=SC1091
 . "$NVM_DIR/nvm.sh" >/dev/null
@@ -92,16 +95,19 @@ keeper() { # keeper <name> [--dry-run]
 
 # ---------------------------------------------------------------- 6. keeper dry-run
 step "6. keeper --dry-run (no key needed: harvester.keeper() is used for simulation)"
-( cd "$ROOT/keeper" && RPC_URL=$RPC DEPLOYMENT="$DEPLOYMENT" node src/tick.ts --dry-run ) 2>&1 | tee "$OUT/keeper-dry.log"
-[ "${PIPESTATUS[0]}" = 0 ] || fail "keeper dry-run exited non-zero"
-grep -c '"action":"harvestFees"' "$OUT/keeper-dry.log" | sed 's/^/harvestFees result lines: /'
+if [ "$FAST" != 1 ]; then
+  ( cd "$ROOT/keeper" && RPC_URL=$RPC DEPLOYMENT="$DEPLOYMENT" node src/tick.ts --dry-run ) 2>&1 | tee "$OUT/keeper-dry.log"
+  [ "${PIPESTATUS[0]}" = 0 ] || fail "keeper dry-run exited non-zero"
+  grep -c '"action":"harvestFees"' "$OUT/keeper-dry.log" | sed 's/^/harvestFees result lines: /'
+else echo "skipped (--fast)"; fi
 
 # ---------------------------------------------------------------- 7. keeper real tick
 step "7. keeper real tick (harvestFees)"
 keeper harvest || fail "keeper harvest tick exited non-zero"
 node scripts/rehearsal/steps.ts assert-harvest || fail "assert-harvest"
 
-# ---------------------------------------------------------------- 8. time travel + settle
+# ---------------------------------------------------------------- 8-10. settle, dividend, idle (skipped by --fast)
+if [ "$FAST" != 1 ]; then
 step "8. time travel past nextSettleAt, keeper settles"
 node scripts/rehearsal/steps.ts snapshot pre_settle
 node scripts/rehearsal/steps.ts warp
@@ -125,6 +131,7 @@ fi
 step "10. idle tick (must plan nothing)"
 keeper idle || fail "keeper idle tick exited non-zero"
 if grep -q '"msg":"plan".*"actions":\[\]' "$OUT/keeper-idle.log"; then echo "PASS  idle tick planned 0 actions"; else fail "idle tick planned actions"; fi
+fi
 
 # ---------------------------------------------------------------- gas
 step "gas per keeper action"

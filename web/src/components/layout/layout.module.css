@@ -1,22 +1,43 @@
 .header { border-bottom: 1px solid var(--rule); background: var(--paper); position: sticky; top: 0; z-index: 20; }
-.bar { display: flex; align-items: center; gap: var(--space-4); min-height: 60px; flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px; }
-.logo { font-family: var(--font-mono); font-weight: 800; letter-spacing: 0.14em; text-decoration: none; font-size: 1.05rem; }
-.nav { display: flex; gap: var(--space-4); flex-wrap: wrap; flex: 1; }
-.nav a { text-decoration: none; padding: 6px 2px; border-bottom: 2px solid transparent; font-size: 0.95rem; }
-.nav a:hover { border-bottom-color: var(--rule); }
-.nav a[aria-current="page"] { border-bottom-color: var(--ink); font-weight: 650; }
-.right { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
-.burn { font-family: var(--font-mono); font-size: 0.85rem; display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 10px; background: var(--paper-2); text-decoration: none; white-space: nowrap; }
-.burn:hover { border-color: var(--ink); }
-.theme { font: inherit; background: none; border: 1px solid var(--rule); border-radius: var(--radius); color: var(--ink); cursor: pointer; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; }
-.theme:hover { background: var(--paper-2); }
+.bar { display: flex; align-items: center; gap: var(--space-4); min-height: 60px; padding-top: 8px; padding-bottom: 8px; }
+.logo { font-family: var(--font-mono); font-weight: 600; letter-spacing: 0.14em; text-decoration: none; font-size: 1.05rem; flex: none; }
+
+/* Nav + burn counter share one row: nav on the left, burn counter at the end. */
+.navRow { display: flex; align-items: center; gap: var(--space-4); flex: 1; min-width: 0; }
+.nav { display: flex; gap: var(--space-4); flex: 1; white-space: nowrap; }
+.nav a { text-decoration: none; padding: 6px 2px; border-bottom: 2px solid transparent; font-size: 0.95rem; transition: border-color var(--ease), color var(--ease); }
+.nav a:hover { border-bottom-color: var(--ink-2); }
+.nav a[aria-current="page"] { border-bottom-color: var(--ink); font-weight: 600; }
+.actions { display: flex; align-items: center; gap: var(--space-3); flex: none; }
+.burn { font-size: 0.8rem; color: var(--ink-2); display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--rule); border-radius: 999px; padding: 3px 10px; text-decoration: none; white-space: nowrap; flex: none; }
+.burn :global(.num) { color: var(--ink); }
+.theme {
+  font: inherit; background: none; border: 1px solid var(--rule); border-radius: var(--radius); color: var(--ink); cursor: pointer;
+  width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+  transition: background var(--ease), border-color var(--ease), transform 80ms ease;
+}
+.theme:hover { background: var(--paper-2); border-color: var(--ink-2); }
+.theme:active { transform: translateY(1px); }
 
 .main { padding-top: var(--space-6); padding-bottom: var(--space-7); min-height: 60vh; }
 
 .footer { border-top: 1px solid var(--rule); padding: var(--space-5) 0 var(--space-6); color: var(--ink-2); font-size: 0.85rem; }
-.footer p { max-width: 80ch; }
-.footRow { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: baseline; justify-content: space-between; }
+.footer p { max-width: 72ch; margin-bottom: var(--space-4); line-height: 1.55; }
+.footRow { display: flex; gap: var(--space-2) var(--space-5); flex-wrap: wrap; align-items: baseline; padding-top: var(--space-3); border-top: 1px solid var(--rule); }
+.footer a { color: var(--ink); }
 
+/* Mobile: two rows. Row 1 = wordmark left, theme + Connect right. Row 2 = nav links then the burn counter, scrolling sideways. */
 @media (max-width: 720px) {
-  .nav { order: 3; flex-basis: 100%; }
+  .bar { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "logo actions" "nav nav"; gap: 4px var(--space-3); min-height: 0; padding-top: 8px; padding-bottom: 6px; }
+  .logo { grid-area: logo; }
+  .actions { grid-area: actions; justify-self: end; gap: var(--space-2); }
+  .navRow { grid-area: nav; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; margin: 0 calc(-1 * var(--space-4)); padding: 0 var(--space-4); }
+  .navRow::-webkit-scrollbar { display: none; }
+  .nav { flex: none; gap: var(--space-4); }
+  .nav a { padding: 8px 2px; }
+  .burn { margin-left: auto; padding: 2px 8px; }
+  .nav { gap: var(--space-3); }
+}
+@media (max-width: 420px) {
+  .burnWord { display: none; }
 }

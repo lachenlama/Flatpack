@@ -40,8 +40,8 @@ try {
   const page = await browser.newPage(`${APP}/b/${basket}`);
   await has(page, "NAV vs SPY (indexed to 100)");
   await has(page, "Holdings (per share)");
-  await has(page, "Connect your wallet to see your shares");
-  console.log("basket page rendered, disconnected position copy shown");
+  await has(page, "Connect wallet to buy");
+  console.log("basket page rendered, disconnected buy button label shown");
 
   // connect
   await page.clickText("button", "Connect");

@@ -5,11 +5,9 @@ export const BLOCKED_COUNTRIES: ReadonlySet<string> = new Set([
   "US", "CA", "GB", "CH", "CU", "BY", "IR", "KP", "RU", "SY", "UA", "SS", "SD", "MM", "VE",
 ]);
 
-/** Paths that stay reachable for everyone, so judges can read the evidence. */
+/** Paths that stay reachable for everyone, so the public data feed stays open. */
 export function isExemptPath(pathname: string): boolean {
   return (
-    pathname === "/proof" ||
-    pathname.startsWith("/proof/") ||
     pathname === "/restricted" ||
     pathname === "/api" ||
     pathname.startsWith("/api/") ||

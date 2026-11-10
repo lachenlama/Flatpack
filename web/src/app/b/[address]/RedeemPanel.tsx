@@ -9,6 +9,7 @@ import { InfoTip } from "../../../components/ui/Tooltip.tsx";
 import { TxButton } from "../../../components/tx/index.ts";
 import { useWalletState } from "../../../components/wallet/ConnectButton.tsx";
 import { formatAmount } from "../../../lib/format.ts";
+import { ConnectGate } from "./ConnectGate.tsx";
 import { parseAmount, useRefresh } from "./hooks.ts";
 import { iouNotice } from "./states.ts";
 import type { BasketView } from "./types.ts";
@@ -16,7 +17,7 @@ import s from "./basket.module.css";
 
 /** Redeem in kind: burns shares and returns the component Stock Tokens. No oracle, always available; paused legs become IOUs. */
 export function RedeemPanel({ view }: { view: BasketView }) {
-  const { address } = useWalletState();
+  const { address, isConnected } = useWalletState();
   const refresh = useRefresh();
   const [text, setText] = useState("");
   const shares = parseAmount(text, 18);
@@ -46,17 +47,17 @@ export function RedeemPanel({ view }: { view: BasketView }) {
 
   return (
     <div>
-      <h3 style={{ fontSize: "1rem", margin: "0 0 8px" }}>
-        Redeem in kind <InfoTip content="Burns your shares and sends you the underlying Stock Tokens directly. It needs no oracle and no pool, so it works even when markets are closed or a price feed is down." />
-      </h3>
-      <p className={`muted ${s.small}`}>Always available. You receive the Stock Tokens themselves (0.30% fee in shares).</p>
+      <p className={`muted ${s.small}`}>
+        Redeem in kind: always available. You receive the Stock Tokens themselves (0.30% fee in shares).{" "}
+        <InfoTip content="Burns your shares and sends you the underlying Stock Tokens directly. It needs no oracle and no pool, so it works even when markets are closed or a price feed is down." />
+      </p>
       <div className={s.field}>
         <label htmlFor="redeem-shares">Shares to redeem</label>
         <div className={s.inline}>
           <input
             id="redeem-shares"
-            className={s.input}
-            style={{ flex: 1 }}
+            className={`${s.input} ${s.inputLg}`}
+            style={{ flex: 1, minWidth: 0 }}
             inputMode="decimal"
             autoComplete="off"
             placeholder={held !== undefined ? `You hold ${formatAmount(held, 18, { maxFraction: 4 })}` : "0.0"}
@@ -87,8 +88,10 @@ export function RedeemPanel({ view }: { view: BasketView }) {
           {iouNotice(paused.map((c) => c.ticker))}
         </div>
       ) : null}
+      {!isConnected ? (
+        <ConnectGate label="Connect wallet to redeem" />
+      ) : (
       <TxButton
-        variant="ghost"
         disabled={reason !== undefined}
         disabledReason={reason}
         onSuccess={refresh}
@@ -108,6 +111,7 @@ export function RedeemPanel({ view }: { view: BasketView }) {
       >
         Redeem in kind
       </TxButton>
+      )}
     </div>
   );
 }

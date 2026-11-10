@@ -56,5 +56,3 @@ export const explorerAddress = (address: string): string => `${NETWORK.explorer}
 
 /** Public site origin (for share links and OG images). */
 export const SITE_URL: string = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-/** GitHub repo URL used for ADR links on /proof. */
-export const REPO_URL: string = (process.env.NEXT_PUBLIC_REPO_URL || "https://github.com/OWNER/flatpack").replace(/\/$/, "");

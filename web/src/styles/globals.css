@@ -25,12 +25,12 @@ h1, h2, h3, h4 {
   margin: 0 0 var(--space-3);
   letter-spacing: -0.01em;
 }
-h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; }
-h2 { font-size: 1.5rem; font-weight: 650; }
-h3 { font-size: 1.1rem; font-weight: 650; }
+h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; letter-spacing: -0.028em; line-height: 1.08; }
+h2 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.015em; }
+h3 { font-size: 1.1rem; font-weight: 600; }
 p { margin: 0 0 var(--space-3); }
 
-a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 3px; transition: text-decoration-thickness var(--ease), color var(--ease), border-color var(--ease); }
 a:hover { text-decoration-thickness: 2px; }
 
 :focus-visible { outline: var(--focus); outline-offset: 2px; border-radius: 2px; }

@@ -40,11 +40,16 @@ type Preview = {
 
 const STALE_SEC = 4 * 86400;
 
-function Step({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
+const STEP_COUNT = 5;
+
+/** "11h 37m" -> "11h"; the full form goes in a tooltip. */
+const shortAge = (sec: number): string => formatDuration(sec).split(" ")[0] as string;
+
+function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <section className={s.step} aria-labelledby={`step-${n}`}>
       <div className={s.stepHead}>
-        <span className={s.num} aria-hidden="true">{n}</span>
+        <span className={s.stepLabel}>Step {n} of {STEP_COUNT}</span>
         <h2 id={`step-${n}`}>{title}</h2>
       </div>
       {children}
@@ -237,8 +242,9 @@ export function AssembleForm({ data, nowSec }: { data: AssembleData; nowSec: num
   const sharePrice = TARGET_SHARE_USD;
 
   return (
-    <div className={s.steps}>
-      <Step n="①" title={`Pick 2 to ${MAX_TOKENS} Stock Tokens`}>
+    <div className={s.layout}>
+      <div className={s.steps}>
+      <Step n={1} title={`Pick 2 to ${MAX_TOKENS} Stock Tokens`}>
         <div className={s.field}>
           <label htmlFor="token-search">Search by ticker</label>
           <input id="token-search" className={s.input} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="NVDA, MSFT…" autoComplete="off" />
@@ -251,13 +257,22 @@ export function AssembleForm({ data, nowSec }: { data: AssembleData; nowSec: num
             const age = t.feedUpdatedAt ? nowSec - t.feedUpdatedAt : undefined;
             const on = picked.includes(t.ticker);
             return (
-              <button type="button" key={t.ticker} className={s.pick} aria-pressed={on} onClick={() => toggle(t.ticker)} disabled={!on && picked.length >= MAX_TOKENS} data-ticker={t.ticker}>
+              <button
+                type="button"
+                key={t.ticker}
+                className={s.pick}
+                aria-pressed={on}
+                onClick={() => toggle(t.ticker)}
+                disabled={!on && picked.length >= MAX_TOKENS}
+                data-ticker={t.ticker}
+                title={age === undefined ? "No feed reading" : age > STALE_SEC ? `Feed stale: ${formatDuration(age)} old` : `Feed updated ${formatDuration(age)} ago`}
+              >
                 <span className={s.pickTop}>
-                  <span>{on ? "✓ " : ""}{t.ticker}</span>
+                  <span className={s.pickTicker}>{on ? "✓ " : ""}{t.ticker}</span>
                   <span className="num">{t.priceUsd !== undefined ? formatUsd(t.priceUsd) : "n/a"}</span>
                 </span>
-                <span className={s.pickSub}>
-                  {age === undefined ? "no feed reading" : age > STALE_SEC ? `feed stale: ${formatDuration(age)} old` : `feed updated ${formatDuration(age)} ago`}
+                <span className={age !== undefined && age > STALE_SEC ? s.pickStale : s.pickSub}>
+                  {age === undefined ? "no feed" : age > STALE_SEC ? `stale ${shortAge(age)}` : `${shortAge(age)} ago`}
                 </span>
               </button>
             );
@@ -268,9 +283,9 @@ export function AssembleForm({ data, nowSec }: { data: AssembleData; nowSec: num
         {fieldErr("tokens")}
       </Step>
 
-      <Step n="②" title="Set weights">
+      <Step n={2} title="Set weights">
         {picked.length === 0 ? (
-          <p className="muted">Pick tokens in step ① first.</p>
+          <p className={s.quiet}>Pick tokens in step 1 first.</p>
         ) : (
           <>
             {picked.map((t, i) => (
@@ -293,18 +308,24 @@ export function AssembleForm({ data, nowSec }: { data: AssembleData; nowSec: num
               ariaLabel="Weights"
               items={picked.map((t, i) => ({ key: t, label: t, value: (wcheck.bps[i] ?? 0) / 100, display: `${(wcheck.bps[i] ?? 0) / 100}%` }))}
             />
-            <p className={wcheck.ok ? s.ok : s.err} role="status" data-testid="weight-status">
-              {wcheck.ok ? "✓ Weights total 100%" : `▼ ${wcheck.message}`}
-            </p>
-            <Button variant="ghost" size="sm" onClick={() => setWeights(Object.fromEntries(picked.map((t, i) => [t, evenWeights(picked.length)[i] as string])))}>
-              Even split
-            </Button>
+            <div className={s.wTotal}>
+              <span>Total</span>
+              <span className={`num ${wcheck.ok ? s.ok : s.err}`} data-testid="weight-total">{wcheck.sumBps / 100}%</span>
+              <span className={wcheck.ok ? s.ok : s.err} role="status" data-testid="weight-status">
+                {wcheck.ok ? "✓ Weights total 100%" : `▼ ${wcheck.message}`}
+              </span>
+            </div>
+            <div style={{ marginTop: 8 }}>
+              <Button variant="ghost" size="sm" onClick={() => setWeights(Object.fromEntries(picked.map((t, i) => [t, evenWeights(picked.length)[i] as string])))}>
+                Even split
+              </Button>
+            </div>
           </>
         )}
         {fieldErr("weights")}
       </Step>
 
-      <Step n="③" title="Name it">
+      <Step n={3} title="Name it">
         <div className={s.two}>
           <div className={s.field}>
             <label htmlFor="b-name">Name (3 to 32 characters)</label>
@@ -329,9 +350,9 @@ export function AssembleForm({ data, nowSec }: { data: AssembleData; nowSec: num
         </p>
       </Step>
 
-      <Step n="④" title="Preview">
+      <Step n={4} title="Preview">
         {!wcheck.ok || !input ? (
-          <p className="muted">Finish steps ① and ② to see the recipe.</p>
+          <p className={s.quiet}>Finish steps 1 and 2 to see the recipe.</p>
         ) : previewErr ? (
           <p className={s.err}>{previewErr}</p>
         ) : !preview ? (
@@ -376,7 +397,7 @@ export function AssembleForm({ data, nowSec }: { data: AssembleData; nowSec: num
         )}
       </Step>
 
-      <Step n="⑤" title="Stake and publish">
+      <Step n={5} title="Stake and publish">
         <div className={s.field} style={{ maxWidth: 320 }}>
           <label htmlFor="b-stake">
             Stake ($WIF) — at least {formatWif(minStake)}
@@ -388,16 +409,39 @@ export function AssembleForm({ data, nowSec }: { data: AssembleData; nowSec: num
           {address && wifBalance !== undefined ? <p className="muted" style={{ margin: 0, fontSize: "0.85rem" }}>Your balance: {formatWif(wifBalance)} $WIF</p> : null}
           {fieldErr("stake")}
         </div>
-        <div style={{ marginTop: 16 }}>
+      </Step>
+      </div>
+
+      <aside className={s.summary} aria-label="Your basket">
+        <h2 className={s.summaryTitle}>Your basket</h2>
+        {picked.length === 0 ? (
+          <p className={s.quiet}>No tokens picked yet.</p>
+        ) : (
+          <ul className={s.sumList} aria-label="Picked tokens and weights">
+            {picked.map((t) => (
+              <li key={t}>
+                <span className="mono">{t}</span>
+                <span className="num">{(weights[t] ?? "").trim() || "—"}%</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <dl className={s.sumFacts}>
+          <div><dt>Name</dt><dd>{name.trim() || "—"}</dd></div>
+          <div><dt>Symbol</dt><dd className="mono">{symbol.trim() || "—"}</dd></div>
+          <div><dt>Dividends</dt><dd>{mode === "Reinvest" ? "Reinvest" : "Pay in $WIF"}</dd></div>
+          <div><dt>Stake</dt><dd className="num">{stake.trim() || "—"} $WIF</dd></div>
+        </dl>
+        <div className={s.sumAction}>
           <TxButton steps={steps} disabled={!ready} disabledReason={reason} onSuccess={(h) => void onSuccess(h)}>
             Approve and publish
           </TxButton>
           {serverErr?.field === "general" ? <p className={s.err} role="alert">{"▼ "}{serverErr.message}</p> : null}
         </div>
-        <p className="muted" style={{ fontSize: "0.85rem", marginTop: 12 }}>
-          Two transactions: ① approve exactly your stake in $WIF to the BasketFactory, ② create the basket. Nothing here is investment advice.
+        <p className={s.sumNote}>
+          Two transactions: first approve exactly your stake in $WIF to the BasketFactory, then create the basket. Nothing here is investment advice.
         </p>
-      </Step>
+      </aside>
     </div>
   );
 }

@@ -80,12 +80,11 @@ export function BackingCard({ view, backed, warmingTotal }: { view: BasketView; 
         </div>
       ) : null}
       <p className={`muted ${s.small}`}>
-        Back this basket with $WIF to share its weekly rewards when it beats SPY. New stake warms up first: it starts earning at the settle after
-        you add it, so nobody can stake just before a known result. Unstaking has a 7-day cooldown.
+        Back this basket with $WIF to share its weekly rewards when it beats SPY. New stake warms up until the next settle, and unstaking has a 7-day cooldown.
       </p>
 
       {!address ? (
-        <TxButton steps={[]}>Connect to back</TxButton>
+        <p className={`muted ${s.small}`}>Connect a wallet to back this basket.</p>
       ) : (
         <>
           {p && p.warming > 0n ? (

@@ -11,9 +11,6 @@ Built for the [world is flat hackathon](https://worldisflat.fun/build).
 | [FLATPACK-PLAN.md](FLATPACK-PLAN.md) | Product plan, edge cases, the $WIF design and schedule |
 | [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) | System architecture (components, flows, invariants) |
 | [docs/adr/](docs/adr/) | Architecture decision records |
-| [docs/TEST-PLAN.md](docs/TEST-PLAN.md) | Test strategy and the required test IDs |
-| [docs/ENGINEERING-STANDARDS.md](docs/ENGINEERING-STANDARDS.md) | Coding standards and Definition of Done |
-| [docs/work-packages/](docs/work-packages/) | Implementation briefs and reports |
 | [config/mainnet-4663.json](config/mainnet-4663.json) | Verified onchain addresses |
 
 ## Layout

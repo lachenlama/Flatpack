@@ -15,8 +15,9 @@
   --critical: #d03b3b;
   --warning: #fab219;
 
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  /* --font-plex-sans / --font-plex-mono are set by next/font on <html> (src/app/layout.tsx); the system stacks are the fallback. */
+  --font-sans: var(--font-plex-sans), system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 
   --radius: 6px;
   --radius-lg: 10px;
@@ -29,6 +30,7 @@
   --space-7: 64px;
   --maxw: 1120px;
   --focus: 2px solid var(--ink);
+  --ease: 140ms ease;
   color-scheme: light;
 }
 
@@ -38,7 +40,7 @@
     --paper-2: #1e1e1b;
     --ink: #f0efec;
     --ink-2: #c3c2b7;
-    --rule: #33332f;
+    --rule: #3a3a35;
     --series-1: #3987e5;
     --series-2: #d95926;
     color-scheme: dark;
@@ -50,7 +52,7 @@
   --paper-2: #1e1e1b;
   --ink: #f0efec;
   --ink-2: #c3c2b7;
-  --rule: #33332f;
+  --rule: #3a3a35;
   --series-1: #3987e5;
   --series-2: #d95926;
   color-scheme: dark;

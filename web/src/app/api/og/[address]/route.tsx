@@ -17,7 +17,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ address: strin
 
   const e = b.epoch;
   // No emoji or exotic glyphs: next/og's default font lacks them and emoji would be fetched from a CDN.
-  const vs = e ? `${formatPts(e.beatPts)} vs SPY this epoch (${e.beatPts >= 0 ? "beating" : "behind"})` :"vs SPY: first reading after the next settle";
+  const vs = e ? `${formatPts(e.beatPts)} vs SPY this week (${e.beatPts >= 0 ? "beating" : "behind"})` :"vs SPY: first reading after the next settle";
   const vsColor = e ? (e.beatPts >= 0 ? C.good : C.critical) : C.ink2;
   const name = b.name.length > 34 ? `${b.name.slice(0, 33)}…` : b.name;
 

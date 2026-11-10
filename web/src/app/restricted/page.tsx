@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Card } from "../../components/ui/Card.tsx";
 
 export const metadata: Metadata = { title: "Not available in your region" };
@@ -13,7 +12,7 @@ export default function RestrictedPage() {
       </p>
       <Card title="What you can still do">
         <p>
-          You can read how Flatpack works and inspect the contracts on the <Link href="/proof">Proof page</Link>, and the public data feed at{" "}
+          You can still read the public data feed at{" "}
           <a href="/api/baskets">/api/baskets</a>. Those pages stay open for everyone.
         </p>
       </Card>

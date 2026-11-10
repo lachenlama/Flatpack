@@ -30,13 +30,7 @@ export function PositionCard({ view }: { view: BasketView }) {
     query: { enabled },
   });
 
-  if (!address) {
-    return (
-      <Card title="Your position">
-        <p className="muted">Connect your wallet to see your shares, $WIF dividends and any IOUs.</p>
-      </Card>
-    );
-  }
+  if (!address) return null;
 
   const shares = (bal.data as bigint | undefined) ?? 0n;
   const dividend = (div.data as bigint | undefined) ?? 0n;

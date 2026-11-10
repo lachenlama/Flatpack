@@ -10,7 +10,7 @@ import s from "./explore.module.css";
 
 export const metadata: Metadata = {
   title: "Explore baskets",
-  description: "Every Flatpack basket of Stock Tokens on Robinhood Chain, ranked by performance vs SPY this epoch.",
+  description: "Every Flatpack basket of Stock Tokens on Robinhood Chain, ranked by performance vs SPY this week.",
 };
 
 /** Last up-to-7 daily index values + total change since the first point (percent). */

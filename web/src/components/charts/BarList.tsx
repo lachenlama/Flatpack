@@ -22,18 +22,17 @@ export interface BarItem {
 export function BarList({ items, sorted = true, ariaLabel }: { items: readonly BarItem[]; sorted?: boolean; ariaLabel?: string }) {
   const rows = sorted ? [...items].sort((a, b) => b.value - a.value) : items;
   const max = Math.max(...rows.map((r) => r.value), 0) || 1;
+  const hasSub = rows.some((r) => r.sub);
   return (
-    <ul className={s.bars} aria-label={ariaLabel}>
+    <ul className={`${s.bars} ${hasSub ? s.barsSub : s.barsPlain}`} aria-label={ariaLabel}>
       {rows.map((r) => (
         <li className={s.barRow} key={r.key} title={r.detail}>
           <span className={s.barLabel}>{r.label}</span>
           <span className={s.barTrack} aria-hidden="true">
             <div className={s.barFill} style={{ width: `${(r.value / max) * 100}%` }} />
           </span>
-          <span className={s.barValue}>
-            {r.display}
-            {r.sub ? <span className={s.barSub}>{r.sub}</span> : null}
-          </span>
+          <span className={s.barValue}>{r.display}</span>
+          {hasSub ? <span className={s.barSub}>{r.sub?.trim() ?? ""}</span> : null}
         </li>
       ))}
     </ul>

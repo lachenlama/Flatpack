@@ -3,10 +3,8 @@
 | | |
 |---|---|
 | **Status** | Accepted for build, v1.0 (2026-11-05) |
-| **Owner** | Architecture: Opus (lead). Implementation: Sonnet agents, per the work packages in `docs/work-packages/` |
 | **Product spec** | [`FLATPACK-PLAN.md`](../../FLATPACK-PLAN.md), §3 and §10 |
 | **Decisions** | [`docs/adr/`](../adr/) |
-| **Verification** | [`docs/TEST-PLAN.md`](../TEST-PLAN.md) |
 | **Binding interfaces** | `contracts/src/interfaces/*.sol`. **The NatSpec in those files is the normative spec.** Where this document and the interfaces disagree, the interfaces win, and the mismatch is a bug to report. |
 
 ---

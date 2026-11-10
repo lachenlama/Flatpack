@@ -7,7 +7,6 @@ import { backingVaultAbi, basketAbi, feeHarvesterAbi } from "../../../../shared/
 import { TxButton, type TxStep } from "../../components/tx/index.ts";
 import { BeatBadge, Badge, ModeBadge } from "../../components/ui/Badge.tsx";
 import { ButtonLink } from "../../components/ui/Button.tsx";
-import { Card } from "../../components/ui/Card.tsx";
 import { EmptyState } from "../../components/ui/EmptyState.tsx";
 import { Table, type Column } from "../../components/ui/Table.tsx";
 import { useConnection } from "wagmi";
@@ -19,12 +18,21 @@ import s from "./me.module.css";
 type Sources = "dividends" | "backing" | "curator" | "referral" | "ious";
 
 const COPY: Record<Sources, { title: string; why: string }> = {
-  dividends: { title: "$WIF dividends", why: "You hold shares of a basket that pays its stock dividends in $WIF. The fees' dividend skim is sold for $WIF and streamed to holders." },
-  backing: { title: "Backing rewards", why: "You staked $WIF behind a basket. When it beats SPY in the weekly settle, backers share the rewards." },
-  curator: { title: "Curator rewards", why: "You published these baskets. You earn $WIF from their fees, released when a basket beats SPY at the weekly settle." },
-  referral: { title: "Referral $WIF", why: "People bought baskets through your link. You get a share of those baskets' fees, claimable once a fee cycle is harvested." },
-  ious: { title: "IOUs", why: "A Stock Token was paused by its issuer when you redeemed, so you were paid an IOU for that part. Claim it once the token works again." },
+  dividends: { title: "$WIF dividends", why: "From baskets you hold that pay dividends in $WIF." },
+  backing: { title: "Backing rewards", why: "Your share when a basket you back beats SPY at the weekly settle." },
+  curator: { title: "Curator rewards", why: "From baskets you published, released when they beat SPY." },
+  referral: { title: "Referral $WIF", why: "A share of fees from baskets bought through your link." },
+  ious: { title: "IOUs", why: "Owed for a Stock Token that was paused when you redeemed." },
 };
+
+const shortAddr = (a: string): string => `${a.slice(0, 6)}…${a.slice(-4)}`;
+
+/** One-line total for a claim row: summed $WIF, or a count for IOUs (mixed tokens). */
+function totalOf(source: Sources, items: ClaimDto[]): string {
+  if (items.length === 0) return "—";
+  if (source === "ious") return `${items.length} IOU${items.length > 1 ? "s" : ""}`;
+  return `${fmtWif(items.reduce((a, c) => a + BigInt(c.amount), 0n).toString())} $WIF`;
+}
 
 const fmtWif = (v: string): string => formatWif(BigInt(v));
 
@@ -98,7 +106,10 @@ export function Portfolio({ queryAddress, initial }: { queryAddress?: Address; i
 
   return (
     <div className={s.stack}>
-      <p className="muted mono" style={{ margin: 0 }}>{account}{mine ? "" : " (read-only view)"}</p>
+      <p className={s.acct}>
+        <span className="mono" title={account}>{shortAddr(account)}</span>
+        {mine ? null : <span className={s.tag}>read-only</span>}
+      </p>
       {error ? <p role="alert" className={s.err}>{"▼ "}{error}</p> : null}
       {!view ? <p className="muted" aria-busy="true">Loading from Robinhood Chain…</p> : null}
 
@@ -117,22 +128,32 @@ export function Portfolio({ queryAddress, initial }: { queryAddress?: Address; i
 
           <section aria-labelledby="claims">
             <div className={s.head}>
-              <h2 id="claims">Claim everything</h2>
+              <h2 id="claims">Claims</h2>
               {allSteps.length > 0 ? (
                 <TxButton steps={allSteps} onSuccess={() => void load(account)}>{`Claim everything (${allSteps.length})`}</TxButton>
               ) : null}
             </div>
             {!mine && view ? <p className="muted">Connect this account's wallet to claim.</p> : null}
-            <div className={s.cards} data-testid="claim-cards">
+            <ul className={s.claims} data-testid="claim-cards">
               {sources.map((k) => {
                 const items = view.claims[k];
+                const has = items.length > 0;
                 return (
-                  <Card key={k} title={COPY[k].title} data-testid={`claim-${k}`}>
-                    <p className="muted" style={{ fontSize: "0.88rem" }}>{COPY[k].why}</p>
-                    {items.length === 0 ? (
-                      <p className={s.none}>Nothing to claim.</p>
+                  <li key={k} className={has ? `${s.claim} ${s.claimOn}` : s.claim} data-testid={`claim-${k}`}>
+                    <div className={s.claimMain}>
+                      <span className={s.claimName}>{COPY[k].title}</span>
+                      <span className={s.claimWhy}>{COPY[k].why}</span>
+                    </div>
+                    {has ? (
+                      <span className={`num ${s.claimAmt}`}>{totalOf(k, items)}</span>
                     ) : (
-                      <>
+                      <span className={`num ${s.claimNone}`}>
+                        <span aria-hidden="true">—</span>
+                        <span className="visually-hidden">Nothing to claim</span>
+                      </span>
+                    )}
+                    {has ? (
+                      <div className={s.claimDetail}>
                         <ul className={s.list}>
                           {items.map((c) => (
                             <li key={`${c.basket}-${c.token ?? ""}`}>
@@ -142,12 +163,12 @@ export function Portfolio({ queryAddress, initial }: { queryAddress?: Address; i
                           ))}
                         </ul>
                         {mine ? <TxButton size="sm" steps={stepsFor(k, items, account)} onSuccess={() => void load(account)}>{`Claim ${COPY[k].title}`}</TxButton> : null}
-                      </>
-                    )}
-                  </Card>
+                      </div>
+                    ) : null}
+                  </li>
                 );
               })}
-            </div>
+            </ul>
             {loading ? <p className="muted" aria-busy="true">Refreshing…</p> : null}
           </section>
         </>

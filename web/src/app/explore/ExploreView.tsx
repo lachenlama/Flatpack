@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, type ReactNode } from "react";
 import { Badge, BeatBadge, ModeBadge } from "../../components/ui/Badge.tsx";
 import { Card } from "../../components/ui/Card.tsx";
 import { TickerChips } from "../../components/ui/Chip.tsx";
-import { Table, type Column } from "../../components/ui/Table.tsx";
 import { Sparkline } from "../../components/charts/index.ts";
 import { formatPercent, formatPts, formatUsd } from "../../lib/format.ts";
 import type { BasketMode } from "../../lib/reads/types.ts";
@@ -33,7 +33,7 @@ export interface ExploreRow {
 
 type SortKey = "beat" | "wif" | "tvl" | "newest";
 const SORTS: { key: SortKey; label: string; value: (r: ExploreRow) => number }[] = [
-  { key: "beat", label: "vs SPY this epoch", value: (r) => r.beatPts ?? -Infinity },
+  { key: "beat", label: "vs SPY this week", value: (r) => r.beatPts ?? -Infinity },
   { key: "wif", label: "$WIF backed", value: (r) => r.wifBacked },
   { key: "tvl", label: "TVL", value: (r) => r.tvlUsd },
   { key: "newest", label: "Newest", value: (r) => r.order },
@@ -46,6 +46,14 @@ function Beat({ pts }: { pts: number | null }) {
 }
 const since = (p: number | null): string => (p === null ? "n/a" : formatPercent(p, { sign: true }));
 
+interface Column {
+  key: string;
+  header: string;
+  cell: (r: ExploreRow) => ReactNode;
+  sortValue: (r: ExploreRow) => number | string;
+  numeric?: boolean;
+}
+
 /** Explore leaderboard: sortable table on desktop, sortable cards on mobile. */
 export function ExploreView({ rows }: { rows: ExploreRow[] }) {
   const [sort, setSort] = useState<SortKey>("beat");
@@ -54,19 +62,22 @@ export function ExploreView({ rows }: { rows: ExploreRow[] }) {
     return [...rows].sort((a, b) => f(b) - f(a));
   }, [rows, sort]);
 
-  const columns: Column<ExploreRow>[] = [
+  const router = useRouter();
+  const [tsort, setTsort] = useState<{ key: string; dir: "asc" | "desc" }>({ key: "beat", dir: "desc" });
+
+  const columns: Column[] = [
     {
       key: "name",
       header: "Basket",
       cell: (r) => (
         <div className={s.nameCell}>
-          <Link href={`/b/${r.address}`}>{r.name}</Link>
+          <Link href={`/b/${r.address}`} className={s.rowLink}>{r.name}</Link>
           <TickerChips tickers={r.tickers} max={6} />
         </div>
       ),
       sortValue: (r) => r.name.toLowerCase(),
     },
-    { key: "beat", header: "vs SPY this epoch", cell: (r) => <Beat pts={r.beatPts} />, sortValue: (r) => r.beatPts ?? -1e9 },
+    { key: "beat", header: "vs SPY this week", cell: (r) => <Beat pts={r.beatPts} />, sortValue: (r) => r.beatPts ?? -1e9 },
     {
       key: "since",
       header: "Since launch",
@@ -88,6 +99,22 @@ export function ExploreView({ rows }: { rows: ExploreRow[] }) {
     { key: "mode", header: "Dividends", cell: (r) => <ModeBadge mode={r.mode} />, sortValue: (r) => r.mode },
   ];
 
+  const sortedRows = useMemo(() => {
+    const col = columns.find((c) => c.key === tsort.key);
+    if (!col) return rows;
+    const sign = tsort.dir === "asc" ? 1 : -1;
+    return [...rows].sort((a, b) => {
+      const x = col.sortValue(a);
+      const y = col.sortValue(b);
+      return (x < y ? -1 : x > y ? 1 : 0) * sign;
+    });
+  }, [rows, tsort]);
+
+  const openRow = (e: React.MouseEvent, address: string): void => {
+    if ((e.target as HTMLElement).closest("a, button")) return; // the link handles its own click
+    router.push(`/b/${address}`);
+  };
+
   return (
     <>
       <div className={s.tools}>
@@ -102,13 +129,45 @@ export function ExploreView({ rows }: { rows: ExploreRow[] }) {
       </div>
 
       <div className={s.desktop}>
-        <Table
-          columns={columns}
-          rows={rows}
-          rowKey={(r) => r.address}
-          defaultSort="beat"
-          caption="Baskets ranked by performance versus SPY this epoch (resets every Saturday 02:00 UTC). Performance since launch is past performance, not a forecast."
-        />
+        <p className={s.explainer}>Ranked by performance against SPY this week. Resets Saturday 02:00 UTC.</p>
+        <div className={s.tableWrap}>
+          <table className={s.table}>
+            <caption className="visually-hidden">
+              Baskets ranked by performance versus SPY this week (resets every Saturday 02:00 UTC). Performance since launch is past performance, not a forecast.
+            </caption>
+            <thead>
+              <tr>
+                {columns.map((c) => {
+                  const active = tsort.key === c.key;
+                  return (
+                    <th key={c.key} scope="col" className={c.numeric ? s.right : undefined} aria-sort={active ? (tsort.dir === "asc" ? "ascending" : "descending") : "none"}>
+                      <button
+                        type="button"
+                        className={s.sortBtn}
+                        onClick={() => setTsort({ key: c.key, dir: active && tsort.dir === "desc" ? "asc" : "desc" })}
+                      >
+                        {c.header}
+                        <span className={active ? s.arrowOn : s.arrow} aria-hidden="true">{active ? (tsort.dir === "asc" ? "↑" : "↓") : "↕"}</span>
+                      </button>
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {sortedRows.map((r) => (
+                <tr key={r.address} className={s.row} onClick={(e) => openRow(e, r.address)}>
+                  {columns.map((c) => (
+                    <td key={c.key} className={c.numeric ? `${s.right} num` : undefined}>
+                      {c.cell(r)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className={s.fine}>Since launch is past performance, not a forecast.</p>
       </div>
 
       <div className={s.mobile} aria-label="Baskets">
@@ -121,7 +180,7 @@ export function ExploreView({ rows }: { rows: ExploreRow[] }) {
               </div>
               <TickerChips tickers={r.tickers} max={6} />
               <div className={s.cardRow}>
-                <span>vs SPY this epoch</span>
+                <span>vs SPY this week</span>
                 <Beat pts={r.beatPts} />
               </div>
               <div className={s.cardRow}>

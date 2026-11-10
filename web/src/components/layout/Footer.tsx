@@ -1,4 +1,3 @@
-import Link from "next/link";
 import s from "./layout.module.css";
 
 /** The disclaimer shown on every page (WP5-UX §7). Exported so server-rendered cards can reuse the exact text. */
@@ -12,11 +11,9 @@ export function Footer() {
       <div className="container">
         <p>{DISCLAIMER}</p>
         <div className={s.footRow}>
-          <span>
-            <Link href="/proof">Proof</Link> {"·"} <a href="/api/baskets">Public JSON</a>
-          </span>
+          <a href="/api/baskets">Public JSON</a>
           <a href="https://worldisflat.fun/build" target="_blank" rel="noopener noreferrer">
-            Vote for Flatpack in the world is flat hackathon {"↗"}
+            Vote for Flatpack in the world is flat hackathon
           </a>
         </div>
       </div>

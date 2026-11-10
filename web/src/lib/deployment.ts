@@ -1,6 +1,6 @@
 import { isAddress, type Address } from "viem";
 
-/** Names of the contracts listed on /proof, in display order. */
+/** Names of the contracts in display order. */
 export const CONTRACT_NAMES = [
   "BasketFactory",
   "FlatpackRouter",

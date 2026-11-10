@@ -24,14 +24,21 @@
 .dataTable th:first-child, .dataTable td:first-child { text-align: left; }
 .dataTable th { background: var(--paper-2); position: sticky; top: 0; font-weight: 650; }
 
-.bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-.barRow { display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: var(--space-3); padding: 4px 0; }
+.bars { list-style: none; margin: 0; padding: 0; display: grid; row-gap: 2px; column-gap: var(--space-3); align-items: center; }
+.barsPlain { grid-template-columns: minmax(3.5rem, auto) minmax(0, 1fr) auto; }
+.barsSub { grid-template-columns: minmax(3.5rem, auto) minmax(0, 1fr) auto auto; }
+.barRow { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: center; padding: 4px 0; }
 .barLabel { font-family: var(--font-mono); font-weight: 650; font-size: 0.9rem; }
-.barTrack { height: 18px; background: transparent; }
-.barFill { height: 100%; background: var(--series-1); border-radius: 0 4px 4px 0; min-width: 2px; }
+.barTrack { height: 8px; background: transparent; display: block; }
+.barFill { height: 100%; background: var(--series-1); border-radius: 999px; min-width: 4px; }
 .barValue { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.88rem; text-align: right; white-space: nowrap; }
-.barSub { color: var(--ink-2); margin-left: 8px; }
+.barSub { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.82rem; color: var(--ink-2); text-align: right; white-space: nowrap; }
 
 .spark { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; }
 .sparkSvg { overflow: visible; }
 .sparkLabel { font-family: var(--font-mono); font-size: 0.8rem; }
+/* The chart SVG scales with its container (viewBox 680 wide), so on phones its text shrinks to ~5px: double it there. */
+@media (max-width: 600px) {
+  .axisText { font-size: 20px; }
+  .endLabel { font-size: 16px; }
+}

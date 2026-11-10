@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { zeroAddress, type Abi } from "viem";
 import { useReadContract } from "wagmi";
 import { flatpackRouterAbi } from "../../../../../shared/abi/index.ts";
-import { Card } from "../../../components/ui/Card.tsx";
 import { InfoTip } from "../../../components/ui/Tooltip.tsx";
 import { approveStep, TxButton } from "../../../components/tx/index.ts";
 import { useWalletState } from "../../../components/wallet/ConnectButton.tsx";
@@ -14,6 +13,7 @@ import { erc20Abi } from "../../../lib/erc20.ts";
 import { describeError } from "../../../lib/errors.ts";
 import { formatShares, formatUsdg } from "../../../lib/format.ts";
 import { quoteBuyUsdg, withSlippage } from "../../../lib/quote.ts";
+import { ConnectGate } from "./ConnectGate.tsx";
 import { parseAmount, useRefresh } from "./hooks.ts";
 import { buyBlockReason, corporateNotice, MIN_MINT_SHARES } from "./states.ts";
 import type { BasketView } from "./types.ts";
@@ -26,7 +26,7 @@ type Quote = { state: "idle" } | { state: "loading" } | { state: "ok"; usdg: big
 
 /** Buy panel: quoteBuy (decoded QuoteResult), slippage, (1) exact Approve USDG, (2) Buy, optional ?ref= referrer. */
 export function BuyPanel({ view }: { view: BasketView }) {
-  const { address } = useWalletState();
+  const { address, isConnected } = useWalletState();
   const refresh = useRefresh();
   const router = getDeployment().addresses.FlatpackRouter;
   const [text, setText] = useState("1");
@@ -83,12 +83,12 @@ export function BuyPanel({ view }: { view: BasketView }) {
   const feeShares = shares !== undefined ? (shares * FEE_BPS) / 10_000n : 0n;
 
   return (
-    <Card title="Buy">
+    <div>
       <div className={s.field}>
         <label htmlFor="buy-shares">Shares</label>
         <input
           id="buy-shares"
-          className={s.input}
+          className={`${s.input} ${s.inputLg}`}
           inputMode="decimal"
           autoComplete="off"
           value={text}
@@ -105,11 +105,12 @@ export function BuyPanel({ view }: { view: BasketView }) {
         </div>
       ) : null}
       {view.marketClosed ? (
-        <div className={s.notice} role="status">
-          Markets are closed: weekend AMM prices may differ from the last Chainlink price.
-        </div>
+        <p className={s.noteLine} role="status">
+          Markets closed: AMM prices may differ from the last Chainlink price.
+        </p>
       ) : null}
 
+      <div className={s.summary}>
       <div className={s.row} data-testid="buy-quote">
         <span>You pay</span>
         <span className="num">
@@ -129,6 +130,7 @@ export function BuyPanel({ view }: { view: BasketView }) {
       <div className={s.row}>
         <span>Most you can pay</span>
         <span className="num">{maxIn !== undefined ? `${formatUsdg(maxIn)} USDG` : "n/a"}</span>
+      </div>
       </div>
       <div className={s.slip} role="group" aria-label="Slippage tolerance">
         <span>Slippage</span>
@@ -158,6 +160,9 @@ export function BuyPanel({ view }: { view: BasketView }) {
         </div>
       ) : null}
 
+      {!isConnected ? (
+        <ConnectGate label="Connect wallet to buy" />
+      ) : (
       <TxButton
         disabled={reason !== undefined}
         disabledReason={reason}
@@ -192,6 +197,7 @@ export function BuyPanel({ view }: { view: BasketView }) {
       >
         Approve and buy
       </TxButton>
-    </Card>
+      )}
+    </div>
   );
 }

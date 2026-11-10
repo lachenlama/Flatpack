@@ -25,7 +25,7 @@ const config: HardhatUserConfig = {
     solidity: {
       fuzz: { runs: 1000 },
       invariant: { runs: 256, depth: 64, failOnRevert: false },
-      // fork tests call vm.createSelectFork("robinhood") and are named test_F_* (see docs/TEST-PLAN.md)
+      // fork tests call vm.createSelectFork("robinhood") and are named test_F_* 
       forking: { rpcEndpoints: { robinhood: RH_RPC_URL } },
     },
   },

@@ -12,16 +12,23 @@ export interface SeriesData {
   spy: number[];
 }
 
-/** NAV vs SPY, both indexed to 100, with a Since launch / 30d recipe (hypothetical) toggle. */
+/** Fewest points a series needs before a line is drawn (also what the empty message checks). */
+const MIN_POINTS = 2;
+const drawable = (d: SeriesData | null): d is SeriesData => !!d && d.times.length >= MIN_POINTS;
+
+/**
+ * NAV vs SPY, both indexed to 100, with a Since launch / 30d recipe (hypothetical) toggle. Opens on "Since launch" only when
+ * that series can be drawn; a new basket opens on the 30-day recipe instead.
+ */
 export function ChartPanel({ launch, recipe }: { launch: SeriesData | null; recipe: SeriesData | null }) {
-  const [range, setRange] = useState<"launch" | "recipe">("launch");
+  const [range, setRange] = useState<"launch" | "recipe">(drawable(launch) || !drawable(recipe) ? "launch" : "recipe");
   const data = range === "launch" ? launch : recipe;
   const last = (a: number[] | undefined): number | undefined => (a && a.length ? a[a.length - 1] : undefined);
   const b = last(data?.basket);
   const sp = last(data?.spy);
   return (
-    <Card title="NAV vs SPY (indexed to 100)">
-      <div className={s.seg} role="group" aria-label="Chart range">
+    <Card title="NAV vs SPY (indexed to 100)" className={s.chartCard}>
+      <div className={s.range} role="group" aria-label="Chart range">
         <button type="button" aria-pressed={range === "launch"} onClick={() => setRange("launch")}>
           Since launch
         </button>
@@ -29,7 +36,7 @@ export function ChartPanel({ launch, recipe }: { launch: SeriesData | null; reci
           30d recipe (hypothetical)
         </button>
       </div>
-      {data && data.times.length >= 2 ? (
+      {drawable(data) ? (
         <LineIndexChart
           times={data.times}
           series={[

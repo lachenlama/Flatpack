@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { getAddress, isAddress } from "viem";
 import { BarList } from "../../../components/charts/index.ts";
-import { Address as AddressView } from "../../../components/ui/Address.tsx";
 import { Badge, BeatBadge, ModeBadge } from "../../../components/ui/Badge.tsx";
 import { Card } from "../../../components/ui/Card.tsx";
 import { Countdown } from "../../../components/ui/Countdown.tsx";
 import { EmptyState } from "../../../components/ui/EmptyState.tsx";
 import { InfoTip } from "../../../components/ui/Tooltip.tsx";
 import { SITE_URL, explorerAddress, explorerTx } from "../../../lib/chain.ts";
-import { formatPercent, formatPts, formatUtc, formatWif } from "../../../lib/format.ts";
+import { formatPercent, formatPts, formatWif, shortAddress } from "../../../lib/format.ts";
 import { getMarketData, type MarketData } from "../../../lib/prices.ts";
 import { basketDetail, listBaskets } from "../../../lib/reads/baskets.ts";
 import { blockTimestamps, dividendsHarvestedLogs, feesHarvestedLogs } from "../../../lib/reads/events.ts";
@@ -17,13 +17,13 @@ import { basketSeries, type BasketSeries } from "../../../lib/reads/series.ts";
 import { vaultState } from "../../../lib/reads/vault.ts";
 import { holderCount } from "../../explore/data.ts";
 import { BackingCard } from "./BackingCard.tsx";
-import { BuyPanel } from "./BuyPanel.tsx";
 import { ChartPanel, type SeriesData } from "./ChartPanel.tsx";
 import { PositionCard } from "./PositionCard.tsx";
-import { RedeemPanel } from "./RedeemPanel.tsx";
 import { ShareBar } from "./ShareBar.tsx";
+import { TradePanel } from "./TradePanel.tsx";
 import { corporateNotice, isMarketClosed } from "./states.ts";
 import type { BasketView } from "./types.ts";
+import { formatWhen } from "./when.ts";
 import s from "./basket.module.css";
 
 type Props = { params: Promise<{ address: string }>; searchParams: Promise<{ ref?: string | string[] }> };
@@ -51,6 +51,12 @@ const isNotFoundError = (e: unknown): boolean => typeof e === "object" && e !== 
 
 const safe = async <T,>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
 
+/** Loads both chart series and renders the panel; wrapped in <Suspense> so a slow RPC never blocks the page. */
+async function ChartSection({ address }: { address: `0x${string}` }) {
+  const [launch, recipe] = await Promise.all([safe(basketSeries(address, "launch"), undefined), safe(basketSeries(address, "recipe"), undefined)]);
+  return <ChartPanel launch={toSeries(launch)} recipe={toSeries(recipe)} />;
+}
+
 export default async function BasketPage({ params, searchParams }: Props) {
   const { address: raw } = await params;
   const sp = await searchParams;
@@ -74,10 +80,10 @@ export default async function BasketPage({ params, searchParams }: Props) {
   if (!b) notFound();
 
   const empty: MarketData = { ok: false, session: "closed", tokens: {} };
-  const [market, launch, recipe, vault, fees, divs, holders] = await Promise.all([
+  // The two price-history series are NOT awaited here: they take ~20 sequential RPC round trips per feed, so they stream in
+  // behind a Suspense boundary (see ChartSection) and the rest of the page, including Buy, is interactive straight away.
+  const [market, vault, fees, divs, holders] = await Promise.all([
     safe(getMarketData(), empty),
-    safe(basketSeries(address, "launch"), undefined),
-    safe(basketSeries(address, "recipe"), undefined),
     safe(vaultState(address), undefined),
     safe(feesHarvestedLogs(address), []),
     safe(dividendsHarvestedLogs(address), []),
@@ -131,6 +137,8 @@ export default async function BasketPage({ params, searchParams }: Props) {
       <Badge tone="neutral" icon={"○"}>Markets closed</Badge>
     );
 
+  const usd = (n: number): string => n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
+
   return (
     <>
       <div className={s.top}>
@@ -140,15 +148,33 @@ export default async function BasketPage({ params, searchParams }: Props) {
             <ModeBadge mode={b.mode} />
           </div>
           <p className={s.byline}>
-            <span>by</span> <AddressView address={b.curator} />
-            <span>·</span>
-            <span>{b.tickers.join(" · ")}</span>
-            <span>·</span>
-            <span data-testid="holders">{holders === undefined ? "holders n/a" : `${holders} ${holders === 1 ? "holder" : "holders"}`}</span>
-            <span>·</span>
-            <span>TVL <span className="num" data-testid="tvl">{b.tvlUsd.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 })}</span></span>
+            by{" "}
+            <a className="mono" href={explorerAddress(b.curator)} target="_blank" rel="noopener noreferrer" title={`${b.curator} on the explorer`}>
+              {shortAddress(b.curator)}
+            </a>
           </p>
-          {b.mode === "PayInWif" ? <p className="muted" style={{ margin: "8px 0 0" }}>Dividends paid to holders in $WIF.</p> : null}
+          <dl className={s.stats}>
+            <div>
+              <dt>Holders</dt>
+              <dd className="num" data-testid="holders">{holders === undefined ? "n/a" : holders}</dd>
+            </div>
+            <div>
+              <dt>TVL</dt>
+              <dd className="num" data-testid="tvl">{usd(b.tvlUsd)}</dd>
+            </div>
+            <div>
+              <dt>NAV/share</dt>
+              <dd className="num">{b.navValid ? usd(b.navPerShareUsd) : "n/a"}</dd>
+            </div>
+          </dl>
+          <div className={s.market} data-testid="market-status">
+            {sessionBadge}
+            <span>
+              Prices as of {oldest !== undefined ? <span className="num">{formatWhen(oldest)}</span> : "n/a"} (Chainlink){" "}
+              <InfoTip content="Stock Token prices come from Chainlink feeds, which only update while US markets trade. Market-session and trading-halt flags come from the public Stock Token price API documented for Robinhood Chain." />
+            </span>
+          </div>
+          {b.mode === "PayInWif" ? <p className={`muted ${s.small}`} style={{ margin: "8px 0 0" }}>Dividends paid to holders in $WIF.</p> : null}
         </div>
         <ShareBar address={address} name={b.name} />
       </div>
@@ -160,8 +186,21 @@ export default async function BasketPage({ params, searchParams }: Props) {
       ) : null}
 
       <div className={`${s.grid} ${s.main}`}>
-        <div className={s.stack}>
-          <ChartPanel launch={toSeries(launch)} recipe={toSeries(recipe)} />
+        <div className={`${s.stack} ${s.side}`}>
+          <TradePanel view={view} />
+          <PositionCard view={view} />
+        </div>
+
+        <div className={`${s.stack} ${s.left}`}>
+          <Suspense
+            fallback={
+              <Card title="NAV vs SPY (indexed to 100)" className={s.chartCard}>
+                <p className="muted" role="status">Loading price history from Chainlink…</p>
+              </Card>
+            }
+          >
+            <ChartSection address={address} />
+          </Suspense>
           <Card title="Holdings (per share)">
             <BarList
               ariaLabel="Basket holdings by weight"
@@ -181,22 +220,12 @@ export default async function BasketPage({ params, searchParams }: Props) {
             <p className={`muted ${s.small}`}>Each share holds these Stock Tokens directly. Weight is share of USD value at Chainlink prices.</p>
           </Card>
         </div>
-
-        <div className={s.stack}>
-          <div className={s.stack}>
-            <BuyPanel view={view} />
-            <Card>
-              <RedeemPanel view={view} />
-            </Card>
-          </div>
-          <PositionCard view={view} />
-        </div>
       </div>
 
       <div className={`${s.grid} ${s.three}`}>
-        <Card title="This epoch: Beat-SPY">
-          <p style={{ margin: "0 0 8px" }}>
-            Settles <span className="num">{formatUtc(b.nextSettleAt, true)}</span> (in <Countdown to={b.nextSettleAt} done="due now" />)
+        <Card title="This week vs SPY">
+          <p className={s.settle}>
+            Settles <span className="num">{formatWhen(b.nextSettleAt)}</span> · in <Countdown to={b.nextSettleAt} done="due now" />
           </p>
           {e ? (
             <>
@@ -211,18 +240,17 @@ export default async function BasketPage({ params, searchParams }: Props) {
               <div style={{ marginTop: 8 }}>
                 <BeatBadge pts={e.beatPts} label={formatPts(e.beatPts)} />
               </div>
-              <p className={`muted ${s.small}`}>
+              <p className={`muted ${s.small}`} style={{ marginTop: 8 }}>
                 {Math.abs(e.beatPts) < 0.05
-                  ? "Level with SPY right now (the epoch just started). The result at the settle decides whether the week's queued $WIF rewards are released or burned."
+                  ? "Level with SPY right now; the settle decides whether the week's queued $WIF rewards are released or burned."
                   : e.beating
                   ? "Beating SPY right now: if it holds at the settle, the week's queued $WIF rewards are released to backers and the curator."
                   : "Behind SPY right now: if it stays behind at the settle, the week's queued $WIF rewards are burned."}
               </p>
             </>
           ) : (
-            <p className="muted">No reading yet. The first one appears after the next price update.</p>
+            <p className={`muted ${s.small}`}>No reading yet. The first one appears after the next price update.</p>
           )}
-          <p className={`muted ${s.small}`}>Live NAV against the snapshot taken at the last settle. Not a forecast.</p>
         </Card>
 
         <BackingCard view={view} backed={b.wifBacked} warmingTotal={vault?.totalWarming ?? 0n} />
@@ -248,53 +276,39 @@ export default async function BasketPage({ params, searchParams }: Props) {
             <span>Paid as dividends</span>
             <span className="num">{formatWif(dividends, { maxFraction: 0 })}</span>
           </div>
-          <h4 style={{ margin: "12px 0 4px", fontSize: "0.9rem" }}>Recent harvests</h4>
+          <h4 className={s.subhead}>Recent harvests</h4>
           {recent.length === 0 ? (
-            <p className="muted">No fees harvested yet. The keeper turns buy fees into $WIF each cycle.</p>
+            <p className={`muted ${s.small}`}>No fees harvested yet. The keeper turns buy fees into $WIF each cycle.</p>
           ) : (
-            <table className={s.tbl}>
-              <thead>
-                <tr>
-                  <th scope="col">When (UTC)</th>
-                  <th scope="col">$WIF bought</th>
-                  <th scope="col">Tx</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recent.map((l) => (
-                  <tr key={`${l.transactionHash}-${l.logIndex}`}>
-                    <td>{stamps.get(l.blockNumber) ? formatUtc(stamps.get(l.blockNumber) as number, true) : `block ${l.blockNumber}`}</td>
-                    <td className="num">{formatWif(l.args.wifOut, { maxFraction: 0 })}</td>
-                    <td>
-                      <a href={explorerTx(l.transactionHash)} target="_blank" rel="noopener noreferrer">
-                        view {"↗"}
-                      </a>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <ul className={s.harvests}>
+              {recent.map((l) => {
+                const at = stamps.get(l.blockNumber);
+                return (
+                  <li key={`${l.transactionHash}-${l.logIndex}`}>
+                    <span className={s.harvestWhen}>{at ? formatWhen(at) : `block ${l.blockNumber}`}</span>
+                    <span className="num">{formatWif(l.args.wifOut, { maxFraction: 0 })} $WIF</span>
+                    <a
+                      href={explorerTx(l.transactionHash)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`View harvest transaction ${shortAddress(l.transactionHash)} on the explorer`}
+                    >
+                      View
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
           )}
         </Card>
       </div>
 
-      <div className={s.market} data-testid="market-status">
-        {sessionBadge}
-        <span>
-          {marketClosed ? "Markets closed. " : ""}
-          Prices as of {oldest !== undefined ? <span className="num">{formatUtc(oldest, true)}</span> : "n/a"} (Chainlink){" "}
-          <InfoTip content="Stock Token prices come from Chainlink feeds, which only update while US markets trade. Market-session and trading-halt flags come from the public Stock Token price API documented for Robinhood Chain." />
-        </span>
-      </div>
-
       <p className={s.legal}>
-        Contracts: basket{" "}
+        Basket contract{" "}
         <a href={explorerAddress(address)} target="_blank" rel="noopener noreferrer" className="mono">
-          {address.slice(0, 8)}…{address.slice(-6)} {"↗"}
+          {shortAddress(address)}
         </a>
-        . Not investment advice. Stock Tokens are not available to US persons or in restricted jurisdictions. $WIF has no promise of value.
       </p>
     </>
   );
 }
-

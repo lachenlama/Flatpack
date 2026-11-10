@@ -7,7 +7,7 @@ export { Amount, type AmountProps } from "./Amount.tsx";
 export { Address, type AddressProps } from "./Address.tsx";
 export { Countdown, type CountdownProps } from "./Countdown.tsx";
 export { Tooltip, InfoTip } from "./Tooltip.tsx";
-export { Skeleton } from "./Skeleton.tsx";
+export { Skeleton, SkeletonPage, SkeletonHead, SkeletonCard, SkeletonTiles, SkeletonRows, SkeletonSplit } from "./Skeleton.tsx";
 export { EmptyState } from "./EmptyState.tsx";
 export { Modal, type ModalProps } from "./Modal.tsx";
 export { ToastProvider, useToast, type ToastInput } from "./Toast.tsx";

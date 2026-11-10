@@ -1,20 +1,46 @@
-.steps { display: grid; gap: var(--space-5); margin-top: var(--space-4); }
+.layout { display: grid; gap: var(--space-5); margin-top: var(--space-4); }
+.steps { display: grid; gap: var(--space-5); min-width: 0; }
+@media (min-width: 960px) {
+  .layout { grid-template-columns: minmax(0, 1fr) 320px; gap: var(--space-6); align-items: start; }
+  .summary { position: sticky; top: 80px; }
+}
+.summary { border-top: 2px solid var(--ink); padding-top: var(--space-3); min-width: 0; }
+@media (min-width: 960px) {
+  .summary { border: 1px solid var(--ink); border-radius: var(--radius); padding: var(--space-4); background: var(--paper-2); }
+}
+.summaryTitle { margin: 0 0 var(--space-3); font-size: 1.1rem; }
+.sumList { list-style: none; margin: 0 0 var(--space-3); padding: 0; }
+.sumList li { display: flex; justify-content: space-between; gap: var(--space-3); padding: 4px 0; border-bottom: 1px solid var(--rule); font-size: 0.92rem; }
+.sumFacts { margin: 0 0 var(--space-3); display: grid; gap: 4px; font-size: 0.9rem; }
+.sumFacts > div { display: flex; justify-content: space-between; gap: var(--space-3); }
+.sumFacts dt { color: var(--ink-2); }
+.sumFacts dd { margin: 0; text-align: right; overflow-wrap: anywhere; min-width: 0; }
+.sumAction { margin-top: var(--space-3); }
+.sumNote { margin: var(--space-3) 0 0; font-size: 0.8rem; color: var(--ink-2); }
+.quiet { margin: 0; font-size: 0.88rem; color: var(--ink-2); }
 .step { border-top: 2px solid var(--ink); padding-top: var(--space-3); }
-.stepHead { display: flex; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-3); }
+.stepHead { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--space-1) var(--space-3); margin-bottom: var(--space-3); }
 .stepHead h2 { margin: 0; font-size: 1.25rem; }
-.num { font-family: var(--font-mono); font-size: 1.6rem; line-height: 1; }
+.stepLabel { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
 .picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
 .pick { text-align: left; background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius); padding: var(--space-2) var(--space-3); cursor: pointer; font: inherit; color: var(--ink); display: grid; gap: 2px; }
-.pick:hover { border-color: var(--ink); }
+.pick:hover:not(:disabled) { border-color: var(--ink); }
+.pick:disabled { opacity: 0.5; cursor: not-allowed; }
 .pick[aria-pressed="true"] { border-color: var(--ink); background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--ink); }
+.pickTicker { padding: 0 6px; margin-left: -6px; border-radius: var(--radius); }
+.pick[aria-pressed="true"] .pickTicker { background: var(--ink); color: var(--paper); }
 .pick:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .pickTop { display: flex; justify-content: space-between; font-family: var(--font-mono); font-weight: 650; }
-.pickSub { font-size: 0.8rem; color: var(--ink-2); }
+.pickSub, .pickStale { font-size: 0.72rem; color: var(--ink-2); opacity: 0.8; }
+.pickStale { color: var(--critical); opacity: 1; }
 .input { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius); padding: 8px 10px; min-width: 0; }
 .input:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
 .input[aria-invalid="true"] { border-color: var(--critical); }
 .wRow { display: grid; grid-template-columns: 5rem 7rem 1fr; gap: var(--space-3); align-items: center; margin-bottom: var(--space-2); }
 .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); }
+.wTotal { display: grid; grid-template-columns: 5rem 7rem 1fr; gap: var(--space-3); align-items: baseline; margin-top: var(--space-3); padding-top: var(--space-2); border-top: 1px solid var(--ink); font-weight: 650; }
+.wTotal > span:last-child { font-weight: 400; margin: 0; }
+@media (max-width: 520px) { .wRow, .wTotal { grid-template-columns: 4rem 6.5rem 1fr; gap: var(--space-2); } }
 .field { display: grid; gap: 4px; }
 .field label, .legend { font-size: 0.85rem; color: var(--ink-2); }
 .err { color: var(--critical); font-size: 0.88rem; margin: 4px 0 0; }
