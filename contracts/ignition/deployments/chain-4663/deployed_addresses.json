@@ -1,0 +1,8 @@
+{
+  "Flatpack#BasketImplementation": "0x15B4A18daEEE400c8995D08c227bee76bf2c56AA",
+  "Flatpack#ComponentRegistry": "0x1286A8F8042B96a0Fa27fD9a020B2C0b0A95Aa21",
+  "Flatpack#BackingVault": "0xE4e94c245b69cf45C416509BF3f65C40FE2BAfab",
+  "Flatpack#FeeHarvester": "0x6E1436c74F9e4DBF1A7f4A848600A576dAEEdd86",
+  "Flatpack#BasketFactory": "0xE4DC479A3f6Ff40212b072d28cEaB6fB8BF0f084",
+  "Flatpack#FlatpackRouter": "0x264Be3313BD3FFf8123EE27f3a4fA9b086361563"
+}

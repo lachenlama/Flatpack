@@ -1,0 +1,14 @@
+{
+  "chainId": 4663,
+  "deployedAt": "2026-11-10T16:48:45.493Z",
+  "blockNumber": 111024008,
+  "addresses": {
+    "BasketImplementation": "0x15B4A18daEEE400c8995D08c227bee76bf2c56AA",
+    "ComponentRegistry": "0x1286A8F8042B96a0Fa27fD9a020B2C0b0A95Aa21",
+    "BackingVault": "0xE4e94c245b69cf45C416509BF3f65C40FE2BAfab",
+    "FeeHarvester": "0x6E1436c74F9e4DBF1A7f4A848600A576dAEEdd86",
+    "BasketFactory": "0xE4DC479A3f6Ff40212b072d28cEaB6fB8BF0f084",
+    "FlatpackRouter": "0x264Be3313BD3FFf8123EE27f3a4fA9b086361563",
+    "Basket": "0x15B4A18daEEE400c8995D08c227bee76bf2c56AA"
+  }
+}
