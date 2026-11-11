@@ -231,11 +231,11 @@ export default async function BasketPage({ params, searchParams }: Props) {
             <>
               <div className={s.row}>
                 <span>Basket</span>
-                <span className="num">{formatPercent(e.basketPct, { sign: true })}</span>
+                <span className="num">{formatPercent(e.basketPct, { ratio: false, sign: true })}</span>
               </div>
               <div className={s.row}>
                 <span>SPY</span>
-                <span className="num">{formatPercent(e.benchPct, { sign: true })}</span>
+                <span className="num">{formatPercent(e.benchPct, { ratio: false, sign: true })}</span>
               </div>
               <div style={{ marginTop: 8 }}>
                 <BeatBadge pts={e.beatPts} label={formatPts(e.beatPts)} />

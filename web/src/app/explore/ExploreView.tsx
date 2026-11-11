@@ -44,7 +44,7 @@ const wifText = (n: number): string => n.toLocaleString("en-US", { maximumFracti
 function Beat({ pts }: { pts: number | null }) {
   return pts === null ? <Badge>no reading yet</Badge> : <BeatBadge pts={pts} label={formatPts(pts)} />;
 }
-const since = (p: number | null): string => (p === null ? "n/a" : formatPercent(p, { sign: true }));
+const since = (p: number | null): string => (p === null ? "n/a" : formatPercent(p, { ratio: false, sign: true }));
 
 interface Column {
   key: string;

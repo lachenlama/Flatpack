@@ -106,7 +106,7 @@ export function BuyPanel({ view }: { view: BasketView }) {
       ) : null}
       {view.marketClosed ? (
         <p className={s.noteLine} role="status">
-          Markets closed: AMM prices may differ from the last Chainlink price.
+          Markets closed or a price feed is behind: AMM prices may differ from the last Chainlink price.
         </p>
       ) : null}
 
