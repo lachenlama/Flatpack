@@ -42,8 +42,10 @@ async function main(): Promise<number> {
   const client: ExecClient = {
     simulateContract: (a) => publicClient.simulateContract(a),
     writeContract: (r) => {
-      if (!walletClient) throw new Error("no wallet client (dry-run)");
-      return walletClient.writeContract(r);
+      if (!walletClient || !account) throw new Error("no wallet client (dry-run)");
+      // sim.request.account is the keeper *address* (from simulate); passing it through makes viem use
+      // eth_sendTransaction (node-side signing). Override with the local account so it signs + sendRawTransaction.
+      return walletClient.writeContract({ ...r, account });
     },
     waitForTransactionReceipt: (a) => publicClient.waitForTransactionReceipt(a),
     getBlock: (a) => publicClient.getBlock(a),
